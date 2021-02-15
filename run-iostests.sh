@@ -11,9 +11,6 @@ UITESTPATH=$(pwd)
 
 echo $UITESTPATH
 
-npm install -g appium
-appium &
-
 msbuild ../TestApp.iOS/TestApp.iOS.csproj /p:Platform=iPhoneSimulator /p:Configuration=Release /p:OutputPath=$UITESTPATH/bin/
 
 if [ $? -ne 0 ]
@@ -34,6 +31,10 @@ if [ $? -ne 0 ]
 then
     exit 1
 fi
+
+npm install -g appium
+appium &
+echo "Appium Installed and Started..."
 
 dotnet test ../TestApp.UITests/TestApp.UITests.csproj -o=$UITESTPATH --no-build -r=Results --logger trx
 
