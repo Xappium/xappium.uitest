@@ -15,13 +15,14 @@ namespace TestClient.Android
             var installArgs = $"system-images;android-{version};google_apis;x86";
             using var process = new Process
             {
-                StartInfo = new ProcessStartInfo("echo", $"\"y\" | {ToolPath} --install '{installArgs}'")
+                StartInfo = new ProcessStartInfo(ToolPath, $"--install '{installArgs}'")
                 {
                     CreateNoWindow = true,
                     RedirectStandardOutput = true
                 }
             };
             process.Start();
+            // Echo y
             while (!process.StandardOutput.EndOfStream)
                 Console.WriteLine(process.StandardOutput.ReadLine());
         }

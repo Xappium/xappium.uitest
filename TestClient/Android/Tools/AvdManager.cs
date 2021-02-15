@@ -21,12 +21,14 @@ namespace TestClient.Android
 
             using var process = new Process
             {
-                StartInfo = new ProcessStartInfo("echo", $"\"no\" | {ToolPath} create avd -n {DefaultUITestEmulatorName} -k 'system-images;android-{sdkVersion};google_apis;x86' --force")
+                StartInfo = new ProcessStartInfo(ToolPath, $"create avd -n {DefaultUITestEmulatorName} -k 'system-images;android-{sdkVersion};google_apis;x86' --force")
                 {
                     CreateNoWindow = true,
                     RedirectStandardOutput = true
                 }
             };
+
+            // Echo no
 
             process.Start();
             while (!process.StandardOutput.EndOfStream)
