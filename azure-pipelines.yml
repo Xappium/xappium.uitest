@@ -20,6 +20,10 @@ stages:
         workspace:
           clean: all
         steps:
+          - task: UseDotNet@2
+            inputs:
+              useGlobalJson: true
+
           - bash: |
               npm install -g appium
               appium &
@@ -50,6 +54,10 @@ stages:
         workspace:
           clean: all
         steps:
+          - task: UseDotNet@2
+            inputs:
+              useGlobalJson: true
+
           - bash: |
               npm install -g appium
               appium &
