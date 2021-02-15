@@ -23,7 +23,9 @@ stages:
           - bash: |
               npm install -g appium
               appium &
-          - bash: run-androidtests.sh
+            displayName: 'Install & Run Appium Server'
+          - bash: ./run-androidtests.sh
+            displayName: 'Build & Run UI Tests'
 
           - task: PublishTestResults@2
             condition: always()
@@ -51,7 +53,9 @@ stages:
           - bash: |
               npm install -g appium
               appium &
-          - bash: run-iostests.sh
+            displayName: 'Install & Run Appium Server'
+          - bash: ./run-iostests.sh
+            displayName: 'Build & Run UI Tests'
 
           - task: PublishTestResults@2
             condition: always()
