@@ -15,7 +15,7 @@
     <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <ProvisioningType>automatic</ProvisioningType>
-    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <!-- <CodesignEntitlements>Entitlements.plist</CodesignEntitlements> -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UITest|iPhoneSimulator' ">
     <DebugType>none</DebugType>
