@@ -1,0 +1,68 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
+stages:
+  - stage: test
+    displayName: Run Tests
+    jobs:
+      - job: android_uitest
+        displayName: 'Android UI Tests'
+        pool:
+          vmImage: macOS-latest
+          demands:
+          - MSBuild
+          - Xamarin.Android
+          - JDK
+          - AndroidSDK
+        workspace:
+          clean: all
+        steps:
+          - bash: |
+              npm install -g appium
+              appium &
+          - bash: run-androidtests.sh
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testRunTitle: 'Android Test Run'
+              testResultsFormat: 'XUnit'
+              testResultsFiles: '$(build.sourcesdirectory)/UITest/Results/*.trx'
+              failTaskOnFailedTests: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Screenshots
+            inputs:
+              artifact: 'android-screenshots'
+              targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
+
+      - job: ios_uitest
+        displayName: 'iOS UI Tests'
+        pool:
+          vmImage: macOS-latest
+          demands:
+          - MSBuild
+        workspace:
+          clean: all
+        steps:
+          - bash: |
+              npm install -g appium
+              appium &
+          - bash: run-iostests.sh
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testRunTitle: 'iOS Test Run'
+              testResultsFormat: 'XUnit'
+              testResultsFiles: '$(build.sourcesdirectory)/UITest/Results/*.trx'
+              failTaskOnFailedTests: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Screenshots
+            inputs:
+              artifact: 'ios-screenshots'
+              targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
