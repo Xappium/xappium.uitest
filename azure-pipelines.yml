@@ -21,10 +21,12 @@ stages:
           clean: all
         steps:
           - task: UseDotNet@2
+            displayName: Install .NET 3.1 SDK
             inputs:
               version: 3.1.406
 
           - task: UseDotNet@2
+            displayName: Install .NET 5.0 SDK
             inputs:
               useGlobalJson: true
 
@@ -32,6 +34,7 @@ stages:
               npm install -g appium
               appium &
             displayName: 'Install & Run Appium Server'
+
           - bash: ./run-androidtests.sh
             displayName: 'Build & Run UI Tests'
 
@@ -58,11 +61,22 @@ stages:
         workspace:
           clean: all
         steps:
+          - task: InstallAppleCertificate@2
+            inputs:
+              certSecureFile: iOS_Development.p12
+              certPwd: mobiledev
+
+          - task: InstallAppleProvisioningProfile@1
+            inputs:
+              provProfileSecureFile: Wildcard_Development.mobileprovision
+
           - task: UseDotNet@2
+            displayName: Install .NET 3.1 SDK
             inputs:
               version: 3.1.406
 
           - task: UseDotNet@2
+            displayName: Install .NET 5.0 SDK
             inputs:
               useGlobalJson: true
 
@@ -70,6 +84,7 @@ stages:
               npm install -g appium
               appium &
             displayName: 'Install & Run Appium Server'
+
           - bash: ./run-iostests.sh
             displayName: 'Build & Run UI Tests'
 
