@@ -22,6 +22,10 @@ stages:
         steps:
           - task: UseDotNet@2
             inputs:
+              version: 3.1.406
+
+          - task: UseDotNet@2
+            inputs:
               useGlobalJson: true
 
           - bash: |
@@ -54,6 +58,10 @@ stages:
         workspace:
           clean: all
         steps:
+          - task: UseDotNet@2
+            inputs:
+              version: 3.1.406
+
           - task: UseDotNet@2
             inputs:
               useGlobalJson: true
