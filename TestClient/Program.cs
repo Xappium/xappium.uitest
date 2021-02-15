@@ -99,7 +99,9 @@ namespace TestClient
                     throw new PlatformNotSupportedException($"The Platform '{platform}' is not supported.");
             }
 
-            File.WriteAllText(ConfigPath, JsonSerializer.Serialize(config, options));
+            var jsonOutput = JsonSerializer.Serialize(config, options);
+            File.WriteAllText(ConfigPath, jsonOutput);
+            Console.WriteLine(jsonOutput);
         }
     }
 }
