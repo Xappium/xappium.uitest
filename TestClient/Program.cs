@@ -41,7 +41,17 @@ namespace TestClient
                 platform = "iOS";
             }
             else
+            {
+                var files = new[]
+                {
+                    Directory.EnumerateDirectories(Directory.GetCurrentDirectory()),
+                    Directory.EnumerateFiles(Directory.GetCurrentDirectory())
+                }.SelectMany(x => x);
+                foreach (var file in files)
+                    Console.WriteLine(file);
+
                 throw new FileNotFoundException("Could not locate iOS .app or Android apk.");
+            }
 
             var config = new TestConfiguration();
             if(File.Exists(ConfigPath))
