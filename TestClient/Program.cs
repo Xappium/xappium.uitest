@@ -44,8 +44,8 @@ namespace TestClient
             {
                 var files = new[]
                 {
-                    Directory.EnumerateDirectories(Directory.GetCurrentDirectory()),
-                    Directory.EnumerateFiles(Directory.GetCurrentDirectory())
+                    binDir.GetDirectories().Select(x => x.FullName),
+                    binDir.GetFiles().Select(x => x.FullName)
                 }.SelectMany(x => x);
                 foreach (var file in files)
                     Console.WriteLine(file);
