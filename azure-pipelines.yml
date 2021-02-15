@@ -61,14 +61,14 @@ stages:
         workspace:
           clean: all
         steps:
-          - task: InstallAppleCertificate@2
-            inputs:
-              certSecureFile: iOS_Development.p12
-              certPwd: mobiledev
+          # - task: InstallAppleCertificate@2
+          #   inputs:
+          #     certSecureFile: iOS_Development.p12
+          #     certPwd: mobiledev
 
-          - task: InstallAppleProvisioningProfile@1
-            inputs:
-              provProfileSecureFile: Wildcard_Development.mobileprovision
+          # - task: InstallAppleProvisioningProfile@1
+          #   inputs:
+          #     provProfileSecureFile: Wildcard_Development.mobileprovision
 
           - task: UseDotNet@2
             displayName: Install .NET 3.1 SDK
