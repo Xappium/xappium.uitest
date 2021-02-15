@@ -46,26 +46,17 @@ namespace TestClient.Android
             var i = 0;
             while (true)
             {
-                using var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo(Adb.ToolPath, "wait-for-device shell getprop sys.boot_completed")
-                    {
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true
-                    }
-                };
-                process.Start();
+                var result = ProcessHelper.Run(Adb.ToolPath, "wait-for-device shell getprop sys.boot_completed");
 
-                while (!process.StandardOutput.EndOfStream)
+                if (result.IsErred)
+                    throw new Exception(result.Error);
+
+                if(result.Output.Any(x => x.Trim() == "1"))
                 {
-                    var output = process.StandardOutput.ReadLine().Trim();
-                    if (output == "1")
-                    {
-                        // Wait a few seconds to ensure the OS has fully loaded
-                        Console.WriteLine("Emulator Started... waiting 10 seconds for full boot");
-                        Thread.Sleep(TimeSpan.FromSeconds(10));
-                        return;
-                    }
+                    // Wait a few seconds to ensure the OS has fully loaded
+                    Console.WriteLine("Emulator Started... waiting 10 seconds for full boot");
+                    Thread.Sleep(TimeSpan.FromSeconds(10));
+                    return;
                 }
 
                 if (i++ > 180)
@@ -82,24 +73,13 @@ namespace TestClient.Android
             var i = 0;
             while (true)
             {
-                using var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo(Adb.ToolPath, "wait-for-device shell input keyevent 82")
-                    {
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true
-                    }
-                };
-                process.Start();
-                while (!process.StandardOutput.EndOfStream)
-                {
-                    var output = process.StandardOutput.ReadLine();
-                    if (!string.IsNullOrEmpty(output))
-                        return;
-                }
+                var result = ProcessHelper.Run(Adb.ToolPath, "wait-for-device shell input keyevent 82");
 
-                if (process.IsErred())
-                    throw new Exception(process.ErrorMessage());
+                if (result.IsErred)
+                    throw new Exception(result.Error);
+
+                if (result.Output.Any(x => !string.IsNullOrEmpty(x)))
+                    return;
 
                 if (i++ > 60)
                     throw new TimeoutException("The Emulator is not ready after waiting 60 seconds from the boot completion.");
@@ -143,21 +123,11 @@ namespace TestClient.Android
         public static IEnumerable<string> ListEmulators()
         {
             ThrowIfNull(ToolPath, nameof(Emulator));
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo(ToolPath, "-list-avds")
-                {
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true
-                }
-            };
+            var result = ProcessHelper.Run(ToolPath, "-list-avds");
+            if (result.IsErred)
+                throw new Exception("Error listing emulators");
 
-            process.Start();
-            var emulators = new List<string>();
-            while (!process.StandardOutput.EndOfStream)
-                emulators.Add(process.StandardOutput.ReadLine());
-
-            return emulators;
+            return result.Output.Where(x => !string.IsNullOrEmpty(x));
         }
     }
 }

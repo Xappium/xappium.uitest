@@ -13,18 +13,10 @@ namespace TestClient.Android
             ThrowIfNull(ToolPath, nameof(SdkManager));
 
             var installArgs = $"system-images;android-{version};google_apis;x86";
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo(ToolPath, $"--install '{installArgs}'")
-                {
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true
-                }
-            };
-            process.Start();
-            // Echo y
-            while (!process.StandardOutput.EndOfStream)
-                Console.WriteLine(process.StandardOutput.ReadLine());
+            var result = ProcessHelper.Run(ToolPath, $"--install '{installArgs}'");
+            // echo y
+            if (result.IsErred)
+                throw new Exception(result.Error);
         }
     }
 }

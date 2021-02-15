@@ -31,49 +31,22 @@ namespace TestClient.Android
         public static IEnumerable<AndroidDevice> ListDevices()
         {
             ThrowIfNull(ToolPath, nameof(Adb));
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo(ToolPath, "devices")
-                {
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true
-                }
-            };
-            process.Start();
-            var ids = new List<string>();
-            while (!process.StandardOutput.EndOfStream)
-            {
-                var line = process.StandardOutput.ReadLine();
-                if (!Regex.IsMatch(line, androidDeviceRegex))
-                    continue;
-
-                ids.Add(Regex.Replace(line, androidDeviceRegex, string.Empty));
-            }
-
-            if(!string.IsNullOrEmpty(process.StandardError.ReadToEnd()))
+            var result = ProcessHelper.Run(ToolPath, "devices");
+            if (result.IsErred)
                 return Array.Empty<AndroidDevice>();
+
+            var ids = result.Output.Where(x => Regex.IsMatch(x, androidDeviceRegex))
+                .Select(x => Regex.Replace(x, androidDeviceRegex, string.Empty));
 
             // List of devices attached
             var devices = new List<AndroidDevice>();
             foreach (var deviceId in ids)
             {
-                using var propProcess = new Process
-                {
-                    StartInfo = new ProcessStartInfo(ToolPath, $"-s {deviceId} shell getprop")
-                    {
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true
-                    }
-                };
-                process.Start();
-                var props = new List<string>();
-                while (!propProcess.StandardOutput.EndOfStream)
-                    props.Add(propProcess.StandardOutput.ReadLine());
-
-                if (!string.IsNullOrEmpty(propProcess.StandardError.ReadToEnd()))
+                result = ProcessHelper.Run(ToolPath, $"-s {deviceId} shell getprop");
+                if (result.IsErred)
                     continue;
 
-                devices.Add(new AndroidDevice(deviceId, props.ToArray()));
+                devices.Add(new AndroidDevice(deviceId, result.Output.ToArray()));
             }
 
             return devices;

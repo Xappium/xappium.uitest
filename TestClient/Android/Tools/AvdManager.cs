@@ -19,20 +19,12 @@ namespace TestClient.Android
 
             Console.WriteLine($"Installing Emulator for SDK Version: {sdkVersion}");
 
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo(ToolPath, $"create avd -n {DefaultUITestEmulatorName} -k 'system-images;android-{sdkVersion};google_apis;x86' --force")
-                {
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true
-                }
-            };
+            var result = ProcessHelper.Run(ToolPath, $"create avd -n {DefaultUITestEmulatorName} -k 'system-images;android-{sdkVersion};google_apis;x86' --force");
 
             // Echo no
 
-            process.Start();
-            while (!process.StandardOutput.EndOfStream)
-                Console.WriteLine(process.StandardOutput.ReadLine());
+            if (result.IsErred)
+                throw new Exception(result.Error);
         }
     }
 }
