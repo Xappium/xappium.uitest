@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nuget restore TestApp.sln
+# nuget restore TestApp.sln
 
 rm -rf UITest
 

@@ -30,6 +30,11 @@ stages:
             inputs:
               useGlobalJson: true
 
+          - task: NuGetCommand@2
+            displayName: NuGet Restore
+            inputs:
+              command: restore
+
           # - bash: |
           #     npm install -g appium
           #     appium &
@@ -79,6 +84,11 @@ stages:
             displayName: Install .NET 5.0 SDK
             inputs:
               useGlobalJson: true
+
+          - task: NuGetCommand@2
+            displayName: NuGet Restore
+            inputs:
+              command: restore
 
           # - bash: |
           #     npm install -g appium

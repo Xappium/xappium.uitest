@@ -406,3 +406,5 @@ ASALocalRun/
 
 # Android Resource Designer
 Resource.designer.cs
+
+UITest/
