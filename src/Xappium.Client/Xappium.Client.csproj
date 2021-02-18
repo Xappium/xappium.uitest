@@ -1,18 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Copyright>Copyright Dan Siegel 2021</Copyright>
-    <Owners>dansiegel</Owners>
-    <Summary>The Xappium UITest Client is an easy to use console app designed to help setup the Xappium config for a given Android or iOS project.</Summary>
     <Title>Xappium UITest Client</Title>
+    <Summary>The Xappium UITest Client is an easy to use console app designed to help setup the Xappium config for a given Android or iOS project.</Summary>
+    <ToolCommandName>xappium</ToolCommandName>
+    <PackAsTool>True</PackAsTool>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Apple\" />
-    <Folder Include="Android\" />
-    <Folder Include="Android\Tools\" />
-    <Folder Include="Extensions\" />
-  </ItemGroup>
 </Project>

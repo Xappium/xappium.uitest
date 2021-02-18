@@ -2,19 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Copyright>Copyright Dan Siegel 2021</Copyright>
-    <Owners>dansiegel</Owners>
     <Summary>Xappium.UITest is a lightweight UITest wrapper for Xamarin developers using Appium to UI Test their apps. This simplifies setup and common abstractions making it easier to write UI Tests that are Platform agnostic.</Summary>
     <PackageTags>xamarin;uitest;appium;ios;android</PackageTags>
     <Title>Xappium UITest</Title>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Appium.WebDriver" Version="4.3.1" />
   </ItemGroup>
