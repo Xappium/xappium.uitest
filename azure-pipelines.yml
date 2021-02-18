@@ -8,6 +8,35 @@ stages:
   - stage: test
     displayName: Run Tests
     jobs:
+      - job: build
+        displayName: Build
+        pool:
+          vmImage: windows-latest
+          demands:
+          - MSBuild
+        workspace:
+          clean: all
+        steps:
+          - task: UseDotNet@2
+            displayName: Install .NET 5.0 SDK
+            inputs:
+              useGlobalJson: true
+
+          - task: NuGetCommand@2
+            displayName: NuGet Restore
+            inputs:
+              command: restore
+
+          - task: MSBuild@1
+            inputs:
+              platform: 'Any CPU'
+              configuration: Release
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              artifact: 'nuget'
+              targetPath: $(Build.ArtifactStagingDirectory)
+
       - job: android_uitest
         displayName: 'Android UI Tests'
         pool:
@@ -20,11 +49,6 @@ stages:
         workspace:
           clean: all
         steps:
-          - task: UseDotNet@2
-            displayName: Install .NET 3.1 SDK
-            inputs:
-              version: 3.1.406
-
           - task: UseDotNet@2
             displayName: Install .NET 5.0 SDK
             inputs:
@@ -66,20 +90,6 @@ stages:
         workspace:
           clean: all
         steps:
-          # - task: InstallAppleCertificate@2
-          #   inputs:
-          #     certSecureFile: iOS_Development.p12
-          #     certPwd: mobiledev
-
-          # - task: InstallAppleProvisioningProfile@1
-          #   inputs:
-          #     provProfileSecureFile: Wildcard_Development.mobileprovision
-
-          - task: UseDotNet@2
-            displayName: Install .NET 3.1 SDK
-            inputs:
-              version: 3.1.406
-
           - task: UseDotNet@2
             displayName: Install .NET 5.0 SDK
             inputs:
