@@ -32,15 +32,8 @@ then
     exit 1
 fi
 
-npm install -g appium
-appium &
-
 dotnet test ../sample/TestApp.UITests/TestApp.UITests.csproj -o=$UITESTPATH --no-build -r=Results --logger trx
 
 ExitCode=$?
-
-AppiumPID=$(ps -A | grep appium | awk '{print $1}')
-echo 'Appium PID: $AppiumPID'
-kill $AppiumPID
 
 exit $ExitCode

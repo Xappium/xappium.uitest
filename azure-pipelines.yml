@@ -35,10 +35,10 @@ stages:
             inputs:
               command: restore
 
-          # - bash: |
-          #     npm install -g appium
-          #     appium &
-          #   displayName: 'Install & Run Appium Server'
+          - bash: |
+              npm install -g appium
+              appium &
+            displayName: 'Install & Run Appium Server'
 
           - bash: ./run-androidtests.sh
             displayName: 'Build & Run UI Tests'
@@ -90,10 +90,10 @@ stages:
             inputs:
               command: restore
 
-          # - bash: |
-          #     npm install -g appium
-          #     appium &
-          #   displayName: 'Install & Run Appium Server'
+          - bash: |
+              npm install -g appium
+              appium &
+            displayName: 'Install & Run Appium Server'
 
           - bash: ./run-iostests.sh
             displayName: 'Build & Run UI Tests'
