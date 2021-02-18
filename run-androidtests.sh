@@ -9,12 +9,12 @@ cd UITest
 
 UITESTPATH=$(pwd)
 
-npm install -g appium
-appium &
+# npm install -g appium
+# appium &
 
 echo $UITESTPATH
 
-msbuild ../TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
+msbuild ../TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:AndroidSupportedAbis=x86 /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
 
 if [ $? -ne 0 ]
 then
@@ -28,7 +28,7 @@ then
     exit 1
 fi
 
-dotnet run --project=../TestClient/TestClient.csproj
+dotnet run --project=../Xappium.Client/Xappium.Client.csproj
 
 if [ $? -ne 0 ]
 then
@@ -39,8 +39,8 @@ dotnet test ../TestApp.UITests/TestApp.UITests.csproj -o=$UITESTPATH --no-build 
 
 ExitCode=$?
 
-AppiumPID=$(ps -A | grep appium | awk '{print $1}')
-echo 'Appium PID: $AppiumPID'
-kill $AppiumPID
+# AppiumPID=$(ps -A | grep appium | awk '{print $1}')
+# echo 'Appium PID: $AppiumPID'
+# kill $AppiumPID
 
 exit $ExitCode

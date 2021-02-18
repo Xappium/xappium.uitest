@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <None Update="uitest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
