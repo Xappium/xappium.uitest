@@ -9,9 +9,6 @@ cd UITest
 
 UITESTPATH=$(pwd)
 
-# npm install -g appium
-# appium &
-
 echo $UITESTPATH
 
 msbuild ../sample/TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:AndroidSupportedAbis=x86 /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
@@ -35,12 +32,15 @@ then
     exit 1
 fi
 
+npm install -g appium
+appium &
+
 dotnet test ../sample/TestApp.UITests/TestApp.UITests.csproj -o=$UITESTPATH --no-build -r=Results --logger trx
 
 ExitCode=$?
 
-# AppiumPID=$(ps -A | grep appium | awk '{print $1}')
-# echo 'Appium PID: $AppiumPID'
-# kill $AppiumPID
+AppiumPID=$(ps -A | grep appium | awk '{print $1}')
+echo 'Appium PID: $AppiumPID'
+kill $AppiumPID
 
 exit $ExitCode
