@@ -13,15 +13,4 @@
     <PackageReference Include="Appium.WebDriver" Version="4.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Configuration\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Pages\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Tools\AppleDeviceInfo.cs" />
-    <Compile Remove="Tools\AppleSimulator.cs" />
-    <Compile Remove="Tools\AppleDeviceList.cs" />
-    <Compile Remove="Tools\SimulatorState.cs" />
-  </ItemGroup>
 </Project>

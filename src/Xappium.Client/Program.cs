@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -60,6 +61,12 @@ namespace Xappium.Client
             {
                 config = JsonSerializer.Deserialize<TestConfiguration>(File.ReadAllText(ConfigPath), options);
             }
+
+            if (config.Capabilities is null)
+                config.Capabilities = new Dictionary<string, string>();
+
+            if (config.Settings is null)
+                config.Settings = new Dictionary<string, string>();
 
             config.Platform = platform;
             config.AppPath = appPath;
