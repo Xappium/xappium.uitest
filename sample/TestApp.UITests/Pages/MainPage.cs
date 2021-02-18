@@ -9,7 +9,7 @@ namespace TestApp.UITests.Pages
         {
         }
 
-        protected override string Trait => "MainPage";
+        protected override string Trait => "WelcomeMessage";
 
         public MainPage ValidateWelcomeMessage()
         {

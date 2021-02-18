@@ -6,7 +6,7 @@ namespace TestApp.UITests.Pages
 {
     public class LoginPage : BasePage
     {
-        protected override string Trait => "LoginPage";
+        protected override string Trait => "UsernameEntry";
 
         public LoginPage EnterUsername(string username)
         {
@@ -20,7 +20,6 @@ namespace TestApp.UITests.Pages
         {
             var element = Engine.EnterText("PasswordEntry", password);
             Engine.Screenshot("EnteredPassword");
-            Assert.Equal(password, element.Text);
             return this;
         }
 
