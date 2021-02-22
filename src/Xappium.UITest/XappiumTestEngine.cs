@@ -13,6 +13,8 @@ using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium.iOS;
 using OpenQA.Selenium.Appium.MultiTouch;
 using OpenQA.Selenium.Support.UI;
+using System.Reflection;
+using Xappium.UITest.Pages;
 
 namespace Xappium.UITest
 {
@@ -158,16 +160,23 @@ namespace Xappium.UITest
 
         public void Screenshot(string title, [CallerMemberName] string methodName = null)
         {
-            var method = new StackTrace().GetFrame(1).GetMethod();
+            var st = new StackTrace();
+            var i = 1;
+            MethodBase method = null;
+            do
+            {
+                method = st.GetFrame(i++).GetMethod();
+                if (method.ReflectedType == typeof(BasePage))
+                    method = null;
+            } while (method is null);
+
             var className = method.ReflectedType.Name;
             var namespaceName = method.ReflectedType.Namespace;
 
-            var baseDir = Environment.GetEnvironmentVariable("SCREENSHOT_PATH")
-                ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
+            var baseDir = _config.ScreenshotsPath;
 
             var newFile = string.Format("{0}-{1}.jpg", methodName, title);
-            var newSubDir = Path.Combine(Driver.SessionId.ToString(), namespaceName, className);
-            var newDir = Path.Combine(baseDir, newSubDir);
+            var newDir = Path.Combine(baseDir, Driver.SessionId.ToString(), namespaceName, className);
             var fullPath = Path.Combine(newDir, newFile);
             Directory.CreateDirectory(newDir);
 

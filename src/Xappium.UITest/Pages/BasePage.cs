@@ -13,9 +13,8 @@ namespace Xappium.UITest.Pages
 
         protected BasePage()
         {
-            AssertOnPage(TimeSpan.FromSeconds(30));
             PageName = GetType().Name;
-            Engine.Screenshot("On " + PageName);
+            AssertOnPage(TimeSpan.FromSeconds(30));
         }
 
         /// <summary>
@@ -27,6 +26,7 @@ namespace Xappium.UITest.Pages
             var message = "Unable to verify on page: " + PageName;
 
             Engine.WaitForElement(Trait);
+            Engine.Screenshot("On " + PageName);
             //Assert.DoesNotThrow(() => Engine.WaitForElement(Trait), message);
         }
 
