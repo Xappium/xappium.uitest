@@ -1,0 +1,41 @@
+parameters:
+  projectPath: ''
+  platform: ''
+
+steps:
+- task: DownloadPipelineArtifact@2
+  displayName: Download NuGet
+  inputs:
+    artifactName: nuget
+
+- task: UseDotNet@2
+  displayName: Install .NET SDK
+  inputs:
+    useGlobalJson: true
+
+- bash: |
+    ARTIFACT_DIR=$PIPELINE_WORKSPACE/nuget
+    VERSION=$(cd $ARTIFACT_DIR; ls Xappium.Cli.*.nupkg | perl -nle 'm/Xappium\.Cli\.(.*)\.nupkg/; print $1')
+    dotnet tool install -g Xappium.Cli --version $VERSION --add-source $ARTIFACT_DIR
+    xappiumtest -p ${{ parameters.platfrom }} -uitest sample/TestApp.UITests/TestApp.UITests.csproj -head ${{ parameters.projectPath }}
+  displayName: Run UI Tests
+
+- task: PublishTestResults@2
+  condition: always()
+  inputs:
+    testRunTitle: '${{ parameters.platform }} Test Run'
+    testResultsFormat: 'XUnit'
+    testResultsFiles: '$(build.sourcesdirectory)/UITest/Results/*.trx'
+    failTaskOnFailedTests: true
+
+- task: PublishPipelineArtifact@1
+  displayName: Publish Screenshots
+  inputs:
+    artifact: ${{ parameters.platform }}-screenshots
+    targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
+
+- task: PublishPipelineArtifact@1
+  displayName: Publish Screenshots
+  inputs:
+    artifact: ${{ parameters.platform }}-logs
+    targetPath: $(Build.SourcesDirectory)/UITests/logs

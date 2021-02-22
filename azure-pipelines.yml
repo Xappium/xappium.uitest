@@ -5,11 +5,11 @@ trigger:
     - master
 
 stages:
-  - stage: test
-    displayName: Run Tests
+  - stage: build
+    displayName: Build
     jobs:
-      - job: build
-        displayName: Build
+      - job: buildJob
+        displayName: Build NuGets
         pool:
           vmImage: windows-latest
           demands:
@@ -18,7 +18,7 @@ stages:
           clean: all
         steps:
           - task: UseDotNet@2
-            displayName: Install .NET 5.0 SDK
+            displayName: Install .NET SDK
             inputs:
               useGlobalJson: true
 
@@ -27,15 +27,47 @@ stages:
             inputs:
               command: restore
 
-          - task: MSBuild@1
+          - task: DotNetCoreCLI@2
+            displayName: 'DotNet Build'
             inputs:
-              platform: 'Any CPU'
+              command: build
+              projects: src/**/*.csproj
               configuration: Release
 
           - task: PublishPipelineArtifact@1
             inputs:
               artifact: 'nuget'
               targetPath: $(Build.ArtifactStagingDirectory)
+
+
+  - stage: test
+    displayName: Run Tests
+    jobs:
+      - job: unit_tests
+        displayName: Unit Tests
+        pool:
+          vmImage: macOS-latest
+          demands:
+          - MSBuild
+        workspace:
+          clean: all
+        steps:
+          - task: UseDotNet@2
+            displayName: Install .NET SDK
+            inputs:
+              useGlobalJson: true
+
+          - task: NuGetCommand@2
+            displayName: NuGet Restore
+            inputs:
+              command: restore
+
+          - task: DotNetCoreCLI@2
+            displayName: DotNet Test
+            inputs:
+              projects: tests/**/*.csproj
+              testRunTitle: Unit Tests
+              publishTestResults: true
 
       - job: android_uitest
         displayName: 'Android UI Tests'
@@ -49,37 +81,10 @@ stages:
         workspace:
           clean: all
         steps:
-          - task: UseDotNet@2
-            displayName: Install .NET 5.0 SDK
-            inputs:
-              useGlobalJson: true
-
-          - task: NuGetCommand@2
-            displayName: NuGet Restore
-            inputs:
-              command: restore
-
-          - bash: |
-              npm install -g appium
-              appium &
-            displayName: 'Install & Run Appium Server'
-
-          - bash: ./run-androidtests.sh
-            displayName: 'Build & Run UI Tests'
-
-          - task: PublishTestResults@2
-            condition: always()
-            inputs:
-              testRunTitle: 'Android Test Run'
-              testResultsFormat: 'XUnit'
-              testResultsFiles: '$(build.sourcesdirectory)/UITest/Results/*.trx'
-              failTaskOnFailedTests: true
-
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Screenshots
-            inputs:
-              artifact: 'android-screenshots'
-              targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
+          - template: build/steps/run-uitests.yml
+            parameters:
+              projectPath: sample/TestApp.Android/TestApp.Android.csproj
+              platform: Android
 
       - job: ios_uitest
         displayName: 'iOS UI Tests'
@@ -90,34 +95,7 @@ stages:
         workspace:
           clean: all
         steps:
-          - task: UseDotNet@2
-            displayName: Install .NET 5.0 SDK
-            inputs:
-              useGlobalJson: true
-
-          - task: NuGetCommand@2
-            displayName: NuGet Restore
-            inputs:
-              command: restore
-
-          - bash: |
-              npm install -g appium
-              appium &
-            displayName: 'Install & Run Appium Server'
-
-          - bash: ./run-iostests.sh
-            displayName: 'Build & Run UI Tests'
-
-          - task: PublishTestResults@2
-            condition: always()
-            inputs:
-              testRunTitle: 'iOS Test Run'
-              testResultsFormat: 'XUnit'
-              testResultsFiles: '$(build.sourcesdirectory)/UITest/Results/*.trx'
-              failTaskOnFailedTests: true
-
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Screenshots
-            inputs:
-              artifact: 'ios-screenshots'
-              targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
+          - template: build/steps/run-uitests.yml
+            parameters:
+              projectPath: sample/TestApp.iOS/TestApp.iOS.csproj
+              platform: iOS
