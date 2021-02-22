@@ -34,8 +34,8 @@ namespace Xappium.Tools
                         b.Add($"/p:{key}={value}");
                     }
 
-                    //var logoutput = Path.Combine(baseWorkingDirectory, "logs", $"{Path.GetFileNameWithoutExtension(projectPath)}.binlog");
-                    //b.Add($"/bl:{logoutput}");
+                    var logoutput = Path.Combine(baseWorkingDirectory, "logs", $"{Path.GetFileNameWithoutExtension(projectPath)}.binlog");
+                    b.Add($"/bl:{logoutput}");
                 })
                 .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Console.WriteLine(l)))
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
