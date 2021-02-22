@@ -18,9 +18,7 @@ This repo is currently evolving and may experience breaking API changes. Communi
 | GTK Support | Community Welcome |
 | macOS Support | Community Welcome |
 | Tizen Support | Community Welcome |
-| CLI tool | \*In process |
-
-\* NOTE: The repo currently utilizes a combination of scripts to build and test. It is the aim of the Xappium.Client to replace this with a single CLI tool to run tests on a single Simulator / Emulator as part of a CI Build. An additional CLI Tool will be developed for Enterprise Support for self hosted Device Clouds.
+| CLI tool | In process |
 
 ## Configuration
 
@@ -54,3 +52,24 @@ Any of these properties can be set by you, however the Xappium.Client will autom
 At first it may be confusing that the configuration has both settings and capabilities. The Capabilities are explicit to the Appium Driver configuration. It is worth noting that if you need an explicit override to the way that Xappium is configuring a particular capability you have the ability to override that here.
 
 Settings on the other hand have nothing specifically to do with Xappium.UITest or Appium, but rather are exposed to try to make it easier for you to provide values that you can use for your UI Tests such as user credentials.
+
+## Using the Cli Tool
+
+The Cli tool is meant to provide an easy to use runner for your UI Tests. In order to run your UI Tests you only need to supply 3 parameters:
+
+- The Platform Name (iOS/Android)
+- The path to the UI Test project
+- The path to the App project
+
+It's worth noting that the tools here are designed to provide an experience that is tailored to running on an iOS Simulator or Android Emulator. These settings are not customizable.
+
+```bash
+xappiumtest -p iOS -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.iOS/TestApp.iOS.csproj
+```
+
+**NOTE** While support for .NET 6 Single Projects is planned it is not currently supported. The Platform specification is part of the planned support for this as we will need to know which platform to build for.
+
+In addition to the 3 required parameters 2 additional parameters can be provided:
+
+- (-c --configuration) The Build Configuration. This defaults to Release
+- (-ui-config --uitest-configuration) Specifies a file path that will override the base json config in the UI Test directory
