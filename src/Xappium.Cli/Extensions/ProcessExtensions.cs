@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Xappium.Client.Extensions
+namespace Xappium.Extensions
 {
     internal static class ProcessExtensions
     {

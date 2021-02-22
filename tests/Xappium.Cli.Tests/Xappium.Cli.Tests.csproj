@@ -20,6 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Xappium.Client\Xappium.Client.csproj" />
+    <ProjectReference Include="..\..\src\Xappium.Cli\Xappium.Cli.csproj" />
   </ItemGroup>
 </Project>

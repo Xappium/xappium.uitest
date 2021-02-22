@@ -1,4 +1,4 @@
-﻿namespace Xappium.Client.Apple
+﻿namespace Xappium.Apple
 {
     internal enum SimulatorState
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Xappium.Client.Android
+namespace Xappium.Android
 {
     internal class AndroidDevice
     {

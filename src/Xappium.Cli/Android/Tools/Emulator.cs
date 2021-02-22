@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Xappium.Client.Extensions;
-using static Xappium.Client.Android.AndroidTool;
+using Xappium.Extensions;
+using static Xappium.Android.AndroidTool;
 
-namespace Xappium.Client.Android
+namespace Xappium.Android
 {
     internal static class Emulator
     {

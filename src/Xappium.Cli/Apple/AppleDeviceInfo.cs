@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace Xappium.Client.Apple
+namespace Xappium.Apple
 {
     internal class AppleDeviceInfo
     {

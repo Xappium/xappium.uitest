@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Xappium.Client
+namespace Xappium
 {
     internal class ProcessResult
     {

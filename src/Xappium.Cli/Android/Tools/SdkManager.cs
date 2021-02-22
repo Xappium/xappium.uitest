@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using static Xappium.Client.Android.AndroidTool;
+using static Xappium.Android.AndroidTool;
 
-namespace Xappium.Client.Android
+namespace Xappium.Android
 {
     internal static class SdkManager
     {

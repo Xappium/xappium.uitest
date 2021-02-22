@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Xappium.Client.Android
+namespace Xappium.Android
 {
     internal static class AndroidTool
     {

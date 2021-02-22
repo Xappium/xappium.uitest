@@ -1,8 +1,8 @@
 ﻿using Xunit;
-using Xappium.Client.Android;
+using Xappium.Android;
 using System.Linq;
 
-namespace Xappium.Client.Tests
+namespace Xappium.Cli.Tests
 {
     public class AvdManagerTests
     {

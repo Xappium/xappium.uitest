@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Xappium.Client.Apple
+namespace Xappium.Apple
 {
     internal class AppleDeviceList
     {

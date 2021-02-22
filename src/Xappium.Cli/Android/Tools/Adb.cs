@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static Xappium.Client.Android.AndroidTool;
+using static Xappium.Android.AndroidTool;
 
-namespace Xappium.Client.Android
+namespace Xappium.Android
 {
     internal static class Adb
     {

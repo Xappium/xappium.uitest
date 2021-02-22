@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Xappium.Client.Apple
+namespace Xappium.Apple
 {
     internal static class AppleSimulator
     {

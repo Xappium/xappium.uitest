@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Xappium.Client
+namespace Xappium
 {
     internal static class ProcessHelper
     {
