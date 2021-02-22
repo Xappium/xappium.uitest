@@ -29,8 +29,8 @@ namespace Xappium
         public string UITestProjectPath { get; }
 
         [Option(Description = "Specifies the Head Project csproj path for your iOS or Android project.",
-            LongName = "platform-project-path",
-            ShortName = "head")]
+            LongName = "app-project-path",
+            ShortName = "app")]
         public string DeviceProjectPath { get; }
 
         [Option(Description = "Specifies the target platform such as iOS or Android.",
@@ -52,6 +52,7 @@ namespace Xappium
             Justification = "Called by McMaster")]
         private async Task<int> OnExecuteAsync()
         {
+            IDisposable appium = null;
             try
             {
                 if (!Node.IsInstalled)
@@ -80,7 +81,7 @@ namespace Xappium
                 GenerateTestConfig(headBin, uiTestBin);
 
                 Appium.Install();
-                var appium = await Appium.Run(baseWorkingDirectory);
+                appium = await Appium.Run(baseWorkingDirectory);
 
                 try
                 {
@@ -93,6 +94,7 @@ namespace Xappium
                 finally
                 {
                     appium.Dispose();
+                    appium = null;
                 }
             }
             catch (Exception ex)
@@ -101,6 +103,13 @@ namespace Xappium
                 Console.WriteLine(ex.Message);
                 Console.ResetColor();
                 return 1;
+            }
+            finally
+            {
+                if(appium != null)
+                {
+                    appium.Dispose();
+                }
             }
 
             return 0;
