@@ -65,9 +65,11 @@ stages:
           - task: DotNetCoreCLI@2
             displayName: DotNet Test
             inputs:
+              command: test
               projects: tests/**/*.csproj
-              testRunTitle: Unit Tests
               publishTestResults: true
+              testRunTitle: Unit Tests
+              arguments: '--collect "Code coverage"'
 
       - job: android_uitest
         displayName: 'Android UI Tests'
