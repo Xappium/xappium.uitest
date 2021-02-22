@@ -99,3 +99,37 @@ stages:
             parameters:
               projectPath: sample/TestApp.iOS/TestApp.iOS.csproj
               platform: iOS
+
+  - stage: deploy
+    displayName: Deploy Artifacts
+    condition: always()
+    jobs:
+      - deployment: sponsorConnect
+        displayName: Sponsor Connect
+        environment: Sponsor Connect
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: NuGetCommand@2
+                  displayName: NuGet Push
+                  inputs:
+                    command: push
+                    packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
+                    nuGetFeedType: external
+                    publishFeedCredentials: SponsorConnect
+
+      - deployment: nugetOrg
+        displayName: 'NuGet.org'
+        environment: NuGet
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: NuGetCommand@2
+                  displayName: NuGet Push
+                  inputs:
+                    command: push
+                    packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
+                    nuGetFeedType: external
+                    publishFeedCredentials: 'NuGet.org'
