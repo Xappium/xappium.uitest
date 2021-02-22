@@ -1,8 +1,26 @@
 # Xappium.UITest
 
-The Xappium.UITest framework is a UITest helper framework built on top of Appium. This project is a combination of the work done independently by @dansiegel & @redth taking the best pieces of both.
+Writing Cross Platform (X-Plat) apps can be a challenge. Finding a way to more easily write and run integrated UI Tests can be even more challenging. Xappium.UITest aims to help solve some of these issues by building an additional layer of abstraction over Appium that makes it easier to write X-Plat UI Tests. This project is a combination of the work done independently by [@dansiegel](https://github.com/sponsors/dansiegel) & [@redth](https://github.com/redth) taking the best pieces of both.
 
 This is meant to make it easier for Developers to write and integrate UI Tests with their mobile apps.
+
+## Current State
+
+This repo is currently evolving and may experience breaking API changes. Community feedback and contributions are welcome and encouraged. We hope that this project will serve both as a model and backbone for UI Testing for .NET Developers with classic Xamarin / Xamarin.Forms applications as well as newer .NET 6 / .NET MAUI applications.
+
+### Roadmap
+
+| Description | Status |
+|-------------|:------:|
+| iOS Support | Working locally |
+| Android Support | In process |
+| WinUI Support | Community Welcome |
+| GTK Support | Community Welcome |
+| macOS Support | Community Welcome |
+| Tizen Support | Community Welcome |
+| CLI tool | \*In process |
+
+\* NOTE: The repo currently utilizes a combination of scripts to build and test. It is the aim of the Xappium.Client to replace this with a single CLI tool to run tests on a single Simulator / Emulator as part of a CI Build. An additional CLI Tool will be developed for Enterprise Support for self hosted Device Clouds.
 
 ## Configuration
 
