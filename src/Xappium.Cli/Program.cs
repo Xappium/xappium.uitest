@@ -20,6 +20,10 @@ namespace Xappium
 
         private string baseWorkingDirectory = Path.Combine(Environment.CurrentDirectory, "UITest");
 
+        private FileInfo UITestProjectPathInfo => string.IsNullOrEmpty(UITestProjectPath) ? null : new FileInfo(UITestProjectPath);
+
+        private FileInfo DeviceProjectPathInfo => string.IsNullOrEmpty(DeviceProjectPath) ? null : new FileInfo(DeviceProjectPath);
+
         public static Task<int> Main(string[] args)
             => CommandLineApplication.ExecuteAsync<Program>(args);
 
@@ -85,7 +89,7 @@ namespace Xappium
 
                 try
                 {
-                    await DotNetTool.Test(UITestProjectPath, uiTestBin, Configuration?.Trim(), Path.Combine(baseWorkingDirectory, "Results"));
+                    await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(baseWorkingDirectory, "Results"));
                 }
                 catch(Exception)
                 {
@@ -117,13 +121,13 @@ namespace Xappium
 
         private void ValidatePaths()
         {
-            if (Path.GetExtension(UITestProjectPath) != ".csproj")
+            if (UITestProjectPathInfo.Extension != ".csproj")
                 throw new InvalidOperationException($"The path '{UITestProjectPath}' does not specify a valid csproj");
-            else if (Path.GetExtension(DeviceProjectPath) != ".csproj")
+            else if (DeviceProjectPathInfo.Extension != ".csproj")
                 throw new InvalidOperationException($"The path '{DeviceProjectPath}' does not specify a valid csproj");
-            else if (!File.Exists(UITestProjectPath))
+            else if (!UITestProjectPathInfo.Exists)
                 throw new FileNotFoundException($"The specified UI Test project path does not exist: '{UITestProjectPath}'");
-            else if (!File.Exists(DeviceProjectPath))
+            else if (!DeviceProjectPathInfo.Exists)
                 throw new FileNotFoundException($"The specified Platform head project path does not exist: '{DeviceProjectPath}'");
         }
 
@@ -138,7 +142,7 @@ namespace Xappium
 
             Console.WriteLine("Building Platform head project");
 
-            await NuGet.Restore(DeviceProjectPath).ConfigureAwait(false);
+            await NuGet.Restore(DeviceProjectPathInfo.FullName).ConfigureAwait(false);
 
             switch (Platform)
             {
@@ -146,12 +150,12 @@ namespace Xappium
                     // msbuild ../sample/TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:AndroidSupportedAbis=x86 /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
                     props.Add("AndroidPackageFormat", "apk");
                     props.Add("AndroidSupportedAbis", "x86");
-                    await MSBuild.Build(DeviceProjectPath, baseWorkingDirectory, props, "SignAndroidPackage").ConfigureAwait(false);
+                    await MSBuild.Build(DeviceProjectPathInfo.FullName, baseWorkingDirectory, props, "SignAndroidPackage").ConfigureAwait(false);
                     break;
                 case "iOS":
                     // msbuild ../sample/TestApp.iOS/TestApp.iOS.csproj /p:Platform=iPhoneSimulator /p:Configuration=Release /p:OutputPath=$UITESTPATH/bin/
                     props.Add("Platform", "iPhoneSimulator");
-                    await MSBuild.Build(DeviceProjectPath, baseWorkingDirectory, props).ConfigureAwait(false);
+                    await MSBuild.Build(DeviceProjectPathInfo.FullName, baseWorkingDirectory, props).ConfigureAwait(false);
                     break;
                 default:
                     if (string.IsNullOrEmpty(Platform))
@@ -170,8 +174,8 @@ namespace Xappium
             if (!string.IsNullOrEmpty(Configuration))
                 props.Add("Configuration", Configuration);
 
-            await NuGet.Restore(UITestProjectPath).ConfigureAwait(false);
-            await MSBuild.Build(UITestProjectPath, baseWorkingDirectory, props).ConfigureAwait(false);
+            await NuGet.Restore(UITestProjectPathInfo.FullName).ConfigureAwait(false);
+            await MSBuild.Build(UITestProjectPathInfo.FullName, baseWorkingDirectory, props).ConfigureAwait(false);
         }
 
         private void GenerateTestConfig(string headBin, string uiTestBin)
