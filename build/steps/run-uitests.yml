@@ -18,7 +18,7 @@ steps:
     VERSION=$(cd $PIPELINE_WORKSPACE; ls Xappium.Cli.*.nupkg | perl -nle 'm/Xappium\.Cli\.(.*)\.nupkg/; print $1')
     echo "Installing Xappium.Cli version $VERSION from $PIPELINE_WORKSPACE"
     dotnet tool install -g Xappium.Cli --version $VERSION --add-source $PIPELINE_WORKSPACE
-    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }} --show-config
+    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }} --show-config -artifacts $BUILD_ARTIFACTSTAGINGDIRECTORY
   displayName: Run UI Tests
 
 - task: PublishTestResults@2
@@ -34,4 +34,4 @@ steps:
   condition: always()
   inputs:
     artifact: ${{ parameters.platform }}-uitest
-    targetPath: UITests
+    targetPath: $(Build.ArtifactStagingDirectory)
