@@ -61,7 +61,7 @@ namespace Xappium.UITest
             }
         }
 
-        internal static void StopApp()
+        internal static void AppStopped()
         {
             _testConfig = null;
             _engine = null;

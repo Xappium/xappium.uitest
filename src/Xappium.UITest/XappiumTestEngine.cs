@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -113,7 +113,7 @@ namespace Xappium.UITest
                 Driver.Quit();
                 Driver = null;
                 Wait = null;
-                AppManager.StopApp();
+                AppManager.AppStopped();
             }
         }
 
