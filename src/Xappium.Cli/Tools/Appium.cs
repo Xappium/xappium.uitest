@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +32,7 @@ namespace Xappium.Tools
                     line.Contains("listen EADDRINUSE: address already in use 0.0.0.0:4723"))
                 {
                     completed = true;
-                    tcs.SetResult(cancellationSource);
+                    tcs.SetResult(new AppiumTask(cancellationSource));
                 }
             }
 
@@ -52,6 +51,22 @@ namespace Xappium.Tools
                 .ExecuteAsync(cancellationSource.Token);
 
             return tcs.Task;
+        }
+
+        private class AppiumTask : IDisposable
+        {
+            private CancellationTokenSource _tokenSource { get; }
+
+            public AppiumTask(CancellationTokenSource tokenSource)
+            {
+                _tokenSource = tokenSource;
+            }
+
+            public void Dispose()
+            {
+                _tokenSource.Cancel();
+                _tokenSource.Dispose();
+            }
         }
     }
 }
