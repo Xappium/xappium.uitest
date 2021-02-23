@@ -14,10 +14,10 @@ steps:
     useGlobalJson: true
 
 - bash: |
-    ARTIFACT_DIR=$PIPELINE_WORKSPACE/nuget
-    VERSION=$(cd $ARTIFACT_DIR; ls Xappium.Cli.*.nupkg | perl -nle 'm/Xappium\.Cli\.(.*)\.nupkg/; print $1')
-    dotnet tool install -g Xappium.Cli --version $VERSION --add-source $ARTIFACT_DIR
-    xappiumtest -p ${{ parameters.platfrom }} -uitest sample/TestApp.UITests/TestApp.UITests.csproj -head ${{ parameters.projectPath }}
+    VERSION=$(cd $PIPELINE_WORKSPACE; ls Xappium.Cli.*.nupkg | perl -nle 'm/Xappium\.Cli\.(.*)\.nupkg/; print $1')
+    echo "Installing Xappium.Cli version $VERSION from $PIPELINE_WORKSPACE"
+    dotnet tool install -g Xappium.Cli --version $VERSION --add-source $PIPELINE_WORKSPACE
+    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }}
   displayName: Run UI Tests
 
 - task: PublishTestResults@2
