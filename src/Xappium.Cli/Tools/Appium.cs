@@ -27,10 +27,18 @@ namespace Xappium.Tools
                 if (completed)
                     return;
 
-                if (line.Contains("listener started on 0.0.0.0:4723") ||
-                    line.Contains("make sure there is no other instance of this server running already") ||
+                if (line.Contains("listener started on 0.0.0.0:4723"))
+                {
+                    completed = true;
+                    tcs.SetResult(new AppiumTask(cancellationSource));
+                }
+                else if(line.Contains("make sure there is no other instance of this server running already") ||
                     line.Contains("listen EADDRINUSE: address already in use 0.0.0.0:4723"))
                 {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Another instance of Appium is already running. Note that the logs will not contain any output from the test run.");
+                    Console.ResetColor();
+
                     completed = true;
                     tcs.SetResult(new AppiumTask(cancellationSource));
                 }
