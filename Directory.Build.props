@@ -8,6 +8,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/dansiegel/Xappium.UITest.git</RepositoryUrl>
+    <PackageIcon>xappium-bot.png</PackageIcon>
     <NeutralLanguage>en-US</NeutralLanguage>
     <IncludeSymbols>True</IncludeSymbols>
     <IncludeSource>True</IncludeSource>
