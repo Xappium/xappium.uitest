@@ -12,28 +12,28 @@ This repo is currently evolving and may experience breaking API changes. Communi
 
 | Description | Status |
 |-------------|:------:|
-| iOS Support | Working locally |
+| iOS Support | Partially working |
 | Android Support | In process |
-| WinUI Support | Community Welcome |
-| GTK Support | Community Welcome |
-| macOS Support | Community Welcome |
-| Tizen Support | Community Welcome |
+| WinUI Support | PR Welcome |
+| GTK Support | PR Welcome |
+| macOS Support | PR Welcome |
+| Tizen Support | PR Welcome |
 | CLI tool | In process |
 
 ## Configuration
 
 The UI Test AppManager is configured through a combination of local, embedded, and environment. This gives you a wide variety of configuration options and ways to customize your build. For example you may provide a `uitest.json` that contains common attributes for all builds... this will be automatically copied to the UI Test output directory. You may also conditionally embed a `uitest.ios.json` or `uitest.android.json` with the logical name `uitest.json`. Finally you may use various Environment variables to set the configuration dynamically in a CI build. The order of precedence is as follows:
 
-- Local uitest.json on disk
+- Local uitest.json on disk (this can be overridden in the CLI)
 - Embedded uitest.json in the UITest project assembly
 - Environment Variables
 
-Any of these properties can be set by you, however the Xappium.Client will automatically help you build out a completed config.
+Any of these properties can be set by you, however the Xappium.Cli will automatically help you build out a completed config.
 
 ```json
 {
   "platform": "Android",
-  "appPath": "/Users/dansiegel/repos/Xappium.UITest/UITest/bin/com.avantipoint.testapp-Signed.apk",
+  "appPath": "/<Project Path>/UITest/bin/com.avantipoint.testapp-Signed.apk",
   "appId": "com.avantipoint.testapp",
   "deviceName": "sdk_gphone_x86",
   "udid": "emulator-5554",
@@ -42,29 +42,80 @@ Any of these properties can be set by you, however the Xappium.Client will autom
     "name": "Dan"
   },
   "capabilities": {
-    "appWaitPackage": "com.avantipoint.testapp"
+    "adbPort": "5037"
   }
 }
 ```
 
 ### Settings vs Capabilities
 
-At first it may be confusing that the configuration has both settings and capabilities. The Capabilities are explicit to the Appium Driver configuration. It is worth noting that if you need an explicit override to the way that Xappium is configuring a particular capability you have the ability to override that here.
+At first it may be confusing that the configuration has both settings and capabilities. The Capabilities are explicit to the Appium Driver configuration. It is worth noting that if you need an explicit override to the way that Xappium is configuring a particular capability you have the ability to override that here. Note that the adbPort shown above is provided as an example and is not a required for Android.
 
 Settings on the other hand have nothing specifically to do with Xappium.UITest or Appium, but rather are exposed to try to make it easier for you to provide values that you can use for your UI Tests such as user credentials.
+
+### Integrating with your Test Framework
+
+Each test framework is a little different. The guidance shown here is meant as an example of how you might use this with Xunit. It is however not explicitly tied to any specific test framework. First we'll create a fixture that we can inject into our Test class. This will manage starting the app when it is created and stopping the app when we're done and the fixture is disposed by Xunit.
+
+```cs
+public sealed class AppFixture : IDisposable
+{
+    public AppFixture()
+    {
+        AppManager.StartApp();
+        Engine = AppManager.Engine;
+    }
+
+    public ITestEngine Engine { get; }
+
+    public void Dispose()
+    {
+        Engine.StopApp();
+    }
+}
+```
+
+Next we'll create a CollectionDefinition. This is used by Xunit to help us share our fixture between tests.
+
+```cs
+[CollectionDefinition(nameof(AppFixture))]
+public sealed class AppFixtureCollection : ICollectionFixture<AppFixture>
+{
+}
+```
+
+Finally we'll create a test class and write some tests. In this case we'll assume that we have a LoginPage as our initial launch window in the app. For more information on writing UI Tests with the Page-Object-Model see [Sweeky's talk](https://www.youtube.com/watch?v=4VR861BWkiU) from XamDevSummit.
+
+```cs
+public class AppTests : IClassFixture<AppFixture>
+{
+    private ITestEngine Engine { get; }
+
+    public AppTests(AppFixture fixture)
+    {
+        Engine = fixture.Engine;
+    }
+
+    [Fact]
+    public void AppLaunches()
+    {
+        new LoginPage();
+    }
+}
+```
 
 ## Using the Cli Tool
 
 The Cli tool is meant to provide an easy to use runner for your UI Tests. In order to run your UI Tests you only need to supply 3 parameters:
 
-- The Platform Name (iOS/Android)
+- The Platform Name (iOS/Android) - this is required for .NET MAUI apps
 - The path to the UI Test project
 - The path to the App project
 
 It's worth noting that the tools here are designed to provide an experience that is tailored to running on an iOS Simulator or Android Emulator. These settings are not customizable.
 
 ```bash
-xappiumtest -p iOS -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.iOS/TestApp.iOS.csproj
+xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.iOS/TestApp.iOS.csproj
 ```
 
 **NOTE** While support for .NET 6 Single Projects is planned it is not currently supported. The Platform specification is part of the planned support for this as we will need to know which platform to build for.
