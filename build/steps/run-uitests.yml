@@ -25,17 +25,19 @@ steps:
   inputs:
     testRunTitle: '${{ parameters.platform }} Test Run'
     testResultsFormat: 'XUnit'
-    testResultsFiles: '$(build.sourcesdirectory)/UITest/Results/*.trx'
+    testResultsFiles: '**/Results/*.trx'
     failTaskOnFailedTests: true
 
 - task: PublishPipelineArtifact@1
   displayName: Publish Screenshots
+  condition: always()
   inputs:
     artifact: ${{ parameters.platform }}-screenshots
     targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
 
 - task: PublishPipelineArtifact@1
   displayName: Publish Logs
+  condition: always()
   inputs:
     artifact: ${{ parameters.platform }}-logs
     targetPath: $(Build.SourcesDirectory)/UITests/logs

@@ -8,6 +8,15 @@ namespace Xappium.Android
     {
         private static readonly string s_userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
+        private static readonly string[] s_androidSdkPaths = new[]
+        {
+            Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk"),
+            Path.Combine(s_userProfile, "Library", "Android", "sdk"),
+            Path.Combine(s_userProfile, "android-toolchain", "sdk"),
+            Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk"),
+        };
+
         private static readonly string[] s_searchPaths = new[]
             {
                 Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk"),
@@ -37,35 +46,24 @@ namespace Xappium.Android
                 Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "platform-tools"),
             };
 
-        //public static string GetJavaHome()
-        //{
-        //    var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
-        //    if (!string.IsNullOrEmpty(javaHome))
-        //        return javaHome;
+        static AndroidTool()
+        {
+            var androidHome = Environment.GetEnvironmentVariable("ANDROID_HOME");
+            if (string.IsNullOrEmpty(androidHome))
+            {
+                androidHome = s_androidSdkPaths.FirstOrDefault(x => Directory.Exists(x)) ?? throw new DirectoryNotFoundException("Could not locate the Android Home directory");
+                Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome, EnvironmentVariableTarget.Machine);
+            }
 
-        //    var searchPaths = new[]
-        //    {
-        //        Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "jdk"),
-        //    };
-
-        //    foreach (var path in searchPaths)
-        //    {
-        //        if (Directory.Exists(path))
-        //        {
-        //            javaHome = path;
-        //            var di = new DirectoryInfo(path);
-        //            if (di.GetDirectories().Any(x => x.Name.Contains("microsoft_dist_openjdk")))
-        //            {
-        //                javaHome = di.GetDirectories().First(x => x.Name.Contains("microsoft_dist_openjdk")).FullName;
-        //            }
-
-        //            if (!string.IsNullOrEmpty(javaHome))
-        //                return javaHome;
-        //        }
-        //    }
-
-        //    return null;
-        //}
+            var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
+            if (string.IsNullOrWhiteSpace(javaHome))
+            {
+                // TODO: This needs to be updated to support running on Windows.
+                var result = ProcessHelper.Run("echo", "$(/usr/libexec/java_home)");
+                javaHome = result.Output.FirstOrDefault() ?? throw new DirectoryNotFoundException("Could not locate the Java Home");
+                Environment.SetEnvironmentVariable("JAVA_HOME", javaHome, EnvironmentVariableTarget.Machine);
+            }
+        }
 
         internal static string LocateUtility(string fileName)
         {
@@ -114,6 +112,8 @@ namespace Xappium.Android
 
         internal static void ThrowIfNull(string path, string name)
         {
+            
+
             if (string.IsNullOrEmpty(path))
                 throw new Exception($"No path was found for {name}. Be sure that the ANDROID_HOME or JAVA_HOME has been set and that the adb, sdkmanager, and emulator tools are installed");
         }

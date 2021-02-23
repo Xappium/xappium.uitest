@@ -68,6 +68,8 @@ namespace Xappium
 
                 Directory.CreateDirectory(baseWorkingDirectory);
 
+                Console.WriteLine($"Build and Test artifacts will be stored at {baseWorkingDirectory}");
+
                 ValidatePaths();
 
                 var headBin = Path.Combine(baseWorkingDirectory, "bin", "device");
