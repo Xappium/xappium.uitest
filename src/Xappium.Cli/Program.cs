@@ -80,43 +80,28 @@ namespace Xappium
                 headBin += Path.DirectorySeparatorChar;
                 uiTestBin += Path.DirectorySeparatorChar;
 
-                await CSProjFile.Load(DeviceProjectPathInfo, new DirectoryInfo(uiTestBin), Platform)
-                    .Build(Configuration)
-                    .ConfigureAwait(false);
+                var appProject = CSProjFile.Load(DeviceProjectPathInfo, new DirectoryInfo(headBin), Platform);
+                await appProject.Build(Configuration).ConfigureAwait(false);
                 await BuildUITestProject(uiTestBin).ConfigureAwait(false);
 
-                GenerateTestConfig(headBin, uiTestBin);
+                GenerateTestConfig(headBin, uiTestBin, appProject.Platform);
 
                 Appium.Install();
-                appium = await Appium.Run(baseWorkingDirectory);
+                appium = await Appium.Run(baseWorkingDirectory).ConfigureAwait(false);
 
-                try
-                {
-                    await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(baseWorkingDirectory, "Results"));
-                }
-                catch(Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    appium.Dispose();
-                    appium = null;
-                }
+                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(baseWorkingDirectory, "Results"))
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex);
                 Console.ResetColor();
                 return 1;
             }
             finally
             {
-                if(appium != null)
-                {
-                    appium.Dispose();
-                }
+                appium?.Dispose();
             }
 
             return 0;
@@ -148,7 +133,7 @@ namespace Xappium
             await MSBuild.Build(UITestProjectPathInfo.FullName, baseWorkingDirectory, props).ConfigureAwait(false);
         }
 
-        private void GenerateTestConfig(string headBin, string uiTestBin)
+        private void GenerateTestConfig(string headBin, string uiTestBin, string platform)
         {
             var binDir = new DirectoryInfo(headBin);
             var options = new JsonSerializerOptions
@@ -161,11 +146,12 @@ namespace Xappium
                 ReadCommentHandling = JsonCommentHandling.Skip
             };
 
-            var appPath = Platform switch
+            var appPath = platform switch
             {
                 "Android" => binDir.GetFiles().First(x => x.Name.EndsWith("-Signed.apk")).FullName,
                 "iOS" => binDir.GetDirectories().First(x => x.Name.EndsWith(".app")).FullName,
-                _ => throw new PlatformNotSupportedException()
+                null => throw new ArgumentNullException("No platform was specified"),
+                _ => throw new PlatformNotSupportedException($"The {platform} is not supported")
             };
 
             var config = new TestConfiguration();

@@ -29,6 +29,7 @@ namespace Xappium.BuildSystem
 
         public static CSProjFile Load(FileInfo projectFile, DirectoryInfo outputDirectory, string platform)
         {
+            var errorMessage = $"The Project file '{projectFile.FullName}' is not supported";
             var xdoc = new XmlDocument();
             xdoc.Load(projectFile.OpenRead());
             var properties = xdoc.DocumentElement
@@ -45,7 +46,7 @@ namespace Xappium.BuildSystem
                     .Distinct();
 
                 if (targetFrameworks is null || !targetFrameworks.Any())
-                    throw new PlatformNotSupportedException();
+                    throw new PlatformNotSupportedException(errorMessage);
 
                 var targetFramework = targetFrameworks.FirstOrDefault(x => Regex.IsMatch(x, pattern, RegexOptions.IgnoreCase));
 
@@ -58,22 +59,27 @@ namespace Xappium.BuildSystem
                     return new DotNetSdkProjectFile(projectFile, outputDirectory);
                 }
 
-                throw new PlatformNotSupportedException();
+                throw new PlatformNotSupportedException(errorMessage);
             }
 
             var projectTypeGuidsNode = properties.FirstOrDefault(x => x.Name == "ProjectTypeGuids");
 
             if (projectTypeGuidsNode is null)
-                throw new PlatformNotSupportedException();
+                throw new PlatformNotSupportedException(errorMessage);
 
             var guids = projectTypeGuidsNode.InnerText.Split(';').Select(Parse);
 
             if (guids.Any(x => x == AndroidGuid))
                 return new AndroidProjectFile(projectFile, outputDirectory);
             else if(guids.Any(x => x == iOSGuid))
-                return new iOSProjectFile(projectFile, outputDirectory);
+            {
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    throw new PlatformNotSupportedException("You can only build iOS projects on macOS");
 
-            throw new PlatformNotSupportedException();
+                return new iOSProjectFile(projectFile, outputDirectory);
+            }
+
+            throw new PlatformNotSupportedException(errorMessage);
         }
 
         private static Guid Parse(string projectTypeGuid)
