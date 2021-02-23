@@ -76,7 +76,7 @@ namespace Xappium
                 Directory.CreateDirectory(headBin);
                 Directory.CreateDirectory(uiTestBin);
 
-                // HACK: the iOS SDK fails if the path does not end with a path separator.
+                // HACK: The iOS SDK will mess up the generated app output if a Separator is not at the end of the path.
                 headBin += Path.DirectorySeparatorChar;
                 uiTestBin += Path.DirectorySeparatorChar;
 
@@ -173,13 +173,13 @@ namespace Xappium
             if (config.Settings is null)
                 config.Settings = new Dictionary<string, string>();
 
-            config.Platform = Platform;
+            config.Platform = platform;
             config.AppPath = appPath;
 
             if (string.IsNullOrEmpty(config.ScreenshotsPath))
                 config.ScreenshotsPath = Path.Combine(baseWorkingDirectory, "Screenshots");
 
-            switch(Platform)
+            switch(platform)
             {
                 case "Android":
                     // Ensure WebDrivers are installed
