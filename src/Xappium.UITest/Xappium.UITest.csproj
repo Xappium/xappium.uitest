@@ -7,6 +7,7 @@
     <Title>Xappium UITest</Title>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Xappium.UITest is your solution as a .NET Developer working on X-Plat projects. Finally you can easily write cross platform apps and easily integrate Appium based UI Tests without all of the headaches of figuring out how to set it all up.</Description>
   </PropertyGroup>
 
   <ItemGroup>

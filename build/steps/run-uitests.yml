@@ -35,7 +35,7 @@ steps:
     targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
 
 - task: PublishPipelineArtifact@1
-  displayName: Publish Screenshots
+  displayName: Publish Logs
   inputs:
     artifact: ${{ parameters.platform }}-logs
     targetPath: $(Build.SourcesDirectory)/UITests/logs

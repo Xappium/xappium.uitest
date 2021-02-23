@@ -9,6 +9,7 @@
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>The Xappium Cli is a dotnet tool designed to make your life easier when it comes to UI Testing. It will ensure that Appium is installed, and running, setup your Android Emulator or iOS Simulator and update your Xappium uitest.json to get your tests running.</Description>
   </PropertyGroup>
 
   <ItemGroup>
