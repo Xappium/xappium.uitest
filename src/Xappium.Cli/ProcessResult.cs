@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Xappium
 {
@@ -14,6 +16,7 @@ namespace Xappium
 
         public string Error { get; }
 
-        public bool IsErred => !string.IsNullOrEmpty(Error.Trim());
+        public bool IsErred => !string.IsNullOrEmpty(Error.Trim()) &&
+            Error.Split(Environment.NewLine).Any(x => !x.StartsWith("Warning", StringComparison.InvariantCultureIgnoreCase));
     }
 }
