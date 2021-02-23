@@ -107,6 +107,11 @@ namespace Xappium
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex);
                 Console.ResetColor();
+
+                var logsDir = new DirectoryInfo(Path.Combine(BaseWorkingDirectory, "logs"));
+                if(!logsDir.Exists)
+                    logsDir.Create();
+                File.WriteAllText(Path.Combine(logsDir.FullName, "crash.log"), ex.ToString());
                 return 1;
             }
             finally
