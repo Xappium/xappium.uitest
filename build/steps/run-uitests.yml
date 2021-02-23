@@ -14,10 +14,11 @@ steps:
     useGlobalJson: true
 
 - bash: |
+    export DOTNET_CLI_TELEMETRY_OPTOUT=true
     VERSION=$(cd $PIPELINE_WORKSPACE; ls Xappium.Cli.*.nupkg | perl -nle 'm/Xappium\.Cli\.(.*)\.nupkg/; print $1')
     echo "Installing Xappium.Cli version $VERSION from $PIPELINE_WORKSPACE"
     dotnet tool install -g Xappium.Cli --version $VERSION --add-source $PIPELINE_WORKSPACE
-    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }}
+    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }} --show-config
   displayName: Run UI Tests
 
 - task: PublishTestResults@2
@@ -25,19 +26,12 @@ steps:
   inputs:
     testRunTitle: '${{ parameters.platform }} Test Run'
     testResultsFormat: 'XUnit'
-    testResultsFiles: '**/Results/*.trx'
+    testResultsFiles: '**/*.trx'
     failTaskOnFailedTests: true
 
 - task: PublishPipelineArtifact@1
-  displayName: Publish Screenshots
+  displayName: Publish Artifacts
   condition: always()
   inputs:
-    artifact: ${{ parameters.platform }}-screenshots
-    targetPath: $(Build.SourcesDirectory)/UITests/Screenshots
-
-- task: PublishPipelineArtifact@1
-  displayName: Publish Logs
-  condition: always()
-  inputs:
-    artifact: ${{ parameters.platform }}-logs
-    targetPath: $(Build.SourcesDirectory)/UITests/logs
+    artifact: ${{ parameters.platform }}-uitest
+    targetPath: UITests

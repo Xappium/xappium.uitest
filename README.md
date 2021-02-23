@@ -106,11 +106,11 @@ public class AppTests : IClassFixture<AppFixture>
 
 ## Using the Cli Tool
 
-The Cli tool is meant to provide an easy to use runner for your UI Tests. In order to run your UI Tests you only need to supply 3 parameters:
+The Cli tool is meant to provide an easy to use runner for your UI Tests. In order to run your UI Tests you only need to supply a couple of parameters:
 
-- The Platform Name (iOS/Android) - this is required for .NET MAUI apps
-- The path to the UI Test project
-- The path to the App project
+- (-uitest|--uitest-project-path) The path to the UI Test project
+- (-app|--app-project-path) The path to the App project
+- (-p|--platform) The Platform Name (iOS/Android) - this is ignored for classic Xamarin apps but required for .NET MAUI apps
 
 It's worth noting that the tools here are designed to provide an experience that is tailored to running on an iOS Simulator or Android Emulator. These settings are not customizable.
 
@@ -120,7 +120,9 @@ xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/Te
 
 **NOTE** While support for .NET 6 Single Projects is planned it is not currently supported. The Platform specification is part of the planned support for this as we will need to know which platform to build for.
 
-In addition to the 3 required parameters 2 additional parameters can be provided:
+In addition to the required parameters, a couple more optional parameters can also be provided:
 
-- (-c --configuration) The Build Configuration. This defaults to Release
-- (-ui-config --uitest-configuration) Specifies a file path that will override the base json config in the UI Test directory
+- (-c|--configuration) The Build Configuration. This defaults to Release
+- (-ui-config|--uitest-configuration) Specifies a file path that will override the base json config in the UI Test directory
+- (-artifacts|--artifact-staging-directory) Overrides and specifies the default output directory for all build / test artifacts
+- (-show|--show-config) This will write the generated uitest.json to the console

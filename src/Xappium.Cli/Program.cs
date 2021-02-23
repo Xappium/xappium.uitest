@@ -19,8 +19,6 @@ namespace Xappium
     {
         private const string ConfigFileName = "uitest.json";
 
-        private string baseWorkingDirectory = Path.Combine(Environment.CurrentDirectory, "UITest");
-
         private FileInfo UITestProjectPathInfo => string.IsNullOrEmpty(UITestProjectPath) ? null : new FileInfo(UITestProjectPath);
 
         private FileInfo DeviceProjectPathInfo => string.IsNullOrEmpty(DeviceProjectPath) ? null : new FileInfo(DeviceProjectPath);
@@ -53,6 +51,16 @@ namespace Xappium
             ShortName = "ui-config")]
         public string ConfigurationPath { get; }
 
+        [Option(Description = "Specifies the test artifact folder",
+            LongName = "artifact-staging-directory",
+            ShortName = "artifacts")]
+        public string BaseWorkingDirectory { get; } = Path.Combine(Environment.CurrentDirectory, "UITest");
+
+        [Option(Description = "Will write the generated uitest.json to the console. This should only be done if you do not have sensative settings that may be written to the console.",
+            LongName = "show-config",
+            ShortName = "show")]
+        public bool DisplayGeneratedConfig { get; }
+
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members",
             Justification = "Called by McMaster")]
         private async Task<int> OnExecuteAsync()
@@ -63,17 +71,17 @@ namespace Xappium
                 if (!Node.IsInstalled)
                     throw new Exception("Your environment does not appear to have Node installed. This is required to run Appium");
 
-                if (Directory.Exists(baseWorkingDirectory))
-                    Directory.Delete(baseWorkingDirectory, true);
+                if (Directory.Exists(BaseWorkingDirectory))
+                    Directory.Delete(BaseWorkingDirectory, true);
 
-                Directory.CreateDirectory(baseWorkingDirectory);
+                Directory.CreateDirectory(BaseWorkingDirectory);
 
-                Console.WriteLine($"Build and Test artifacts will be stored at {baseWorkingDirectory}");
+                Console.WriteLine($"Build and Test artifacts will be stored at {BaseWorkingDirectory}");
 
                 ValidatePaths();
 
-                var headBin = Path.Combine(baseWorkingDirectory, "bin", "device");
-                var uiTestBin = Path.Combine(baseWorkingDirectory, "bin", "uitest");
+                var headBin = Path.Combine(BaseWorkingDirectory, "bin", "device");
+                var uiTestBin = Path.Combine(BaseWorkingDirectory, "bin", "uitest");
 
                 Directory.CreateDirectory(headBin);
                 Directory.CreateDirectory(uiTestBin);
@@ -89,9 +97,9 @@ namespace Xappium
                 GenerateTestConfig(headBin, uiTestBin, appProject.Platform);
 
                 Appium.Install();
-                appium = await Appium.Run(baseWorkingDirectory).ConfigureAwait(false);
+                appium = await Appium.Run(BaseWorkingDirectory).ConfigureAwait(false);
 
-                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(baseWorkingDirectory, "Results"))
+                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "Results"))
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -104,6 +112,12 @@ namespace Xappium
             finally
             {
                 appium?.Dispose();
+
+#if !DEBUG
+                var binDir = Path.Combine(BaseWorkingDirectory, "bin");
+                if(Directory.Exists(binDir))
+                    Directory.Delete(binDir, true);
+#endif
             }
 
             return 0;
@@ -132,7 +146,7 @@ namespace Xappium
                 props.Add("Configuration", Configuration);
 
             await NuGet.Restore(UITestProjectPathInfo.FullName).ConfigureAwait(false);
-            await MSBuild.Build(UITestProjectPathInfo.FullName, baseWorkingDirectory, props).ConfigureAwait(false);
+            await MSBuild.Build(UITestProjectPathInfo.FullName, BaseWorkingDirectory, props).ConfigureAwait(false);
         }
 
         private void GenerateTestConfig(string headBin, string uiTestBin, string platform)
@@ -179,7 +193,7 @@ namespace Xappium
             config.AppPath = appPath;
 
             if (string.IsNullOrEmpty(config.ScreenshotsPath))
-                config.ScreenshotsPath = Path.Combine(baseWorkingDirectory, "Screenshots");
+                config.ScreenshotsPath = Path.Combine(BaseWorkingDirectory, "Screenshots");
 
             switch(platform)
             {
@@ -221,7 +235,9 @@ namespace Xappium
 
             var jsonOutput = JsonSerializer.Serialize(config, options);
             File.WriteAllText(testConfig, jsonOutput);
-            Console.WriteLine(jsonOutput);
+
+            if(DisplayGeneratedConfig)
+                Console.WriteLine(jsonOutput);
         }
     }
 }
