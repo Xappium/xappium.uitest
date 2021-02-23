@@ -166,7 +166,7 @@ namespace Xappium.UITest
             do
             {
                 method = st.GetFrame(i++).GetMethod();
-                if (method.ReflectedType == typeof(BasePage))
+                if (method.ReflectedType.Assembly == typeof(XappiumTestEngine).Assembly)
                     method = null;
             } while (method is null);
 
@@ -175,7 +175,7 @@ namespace Xappium.UITest
 
             var baseDir = _config.ScreenshotsPath;
 
-            var newFile = string.Format("{0}-{1}.jpg", methodName, title);
+            var newFile = string.IsNullOrEmpty(title) ? methodName : $"{methodName}-{title}.jpg";
             var newDir = Path.Combine(baseDir, Driver.SessionId.ToString(), namespaceName, className);
             var fullPath = Path.Combine(newDir, newFile);
             Directory.CreateDirectory(newDir);
