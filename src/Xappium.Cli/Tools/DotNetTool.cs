@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using CliWrap;
@@ -14,6 +15,8 @@ namespace Xappium.Tools
             if (string.IsNullOrEmpty(configuration))
                 configuration = "Release";
 
+            var baseDirectory = new DirectoryInfo(resultsDirectory).Parent.FullName;
+            var logFile = Path.Combine(baseDirectory, "logs", "vstest.log");
             var args = new ArgumentsBuilder().Add("test")
                      .Add($"{projectPath}")
                      .Add($"--output={outputPath}")
@@ -21,8 +24,7 @@ namespace Xappium.Tools
                      .Add("--no-build")
                      .Add($"--results-directory={resultsDirectory}")
                      .Add("--logger=trx")
-                     .Add("--diag:logs/log.txt")
-                     //.Add("--verbosity=diagnostic")
+                     .Add($"--diag:{logFile}")
                      .Build();
 
             Console.WriteLine($"Running dotnet test on '{projectPath}'");

@@ -25,7 +25,7 @@ namespace Xappium.BuildSystem
             };
 
             // msbuild ../sample/TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:AndroidSupportedAbis=x86 /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
-            await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.FullName, props, "SignAndroidPackage").ConfigureAwait(false);
+            await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.Parent.FullName, props, "SignAndroidPackage").ConfigureAwait(false);
         }
     }
 }
