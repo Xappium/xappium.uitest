@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -45,7 +45,6 @@ namespace Xappium.UITest
         void SetupDriver()
         {
             var options = new AppiumOptions();
-            AddAdditionalCapability(options, "isHeadless", true);
             ConfigureCapabilities(options);
 
             var url = _config.AppiumServer;
@@ -61,7 +60,7 @@ namespace Xappium.UITest
                 AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "XCUITest");
                 AddAdditionalCapability(options, "autoAcceptAlerts", true);
 
-                Driver = new IOSDriver<AppiumWebElement>(url, options);
+                Driver = new IOSDriver<AppiumWebElement>(url, options, TimeSpan.FromSeconds(20));
             }
             else if (Platform == Platform.Android)
             {
@@ -80,7 +79,7 @@ namespace Xappium.UITest
                 AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "Espresso");
                 AddAdditionalCapability(options, "enforceAppInstall", true);
 
-                Driver = new AndroidDriver<AppiumWebElement>(url, options);
+                Driver = new AndroidDriver<AppiumWebElement>(url, options, TimeSpan.FromSeconds(20));
             }
             else
             {

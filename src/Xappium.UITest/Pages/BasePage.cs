@@ -1,5 +1,4 @@
-﻿using System;
-namespace Xappium.UITest.Pages
+﻿namespace Xappium.UITest.Pages
 {
     public abstract class BasePage
     {
@@ -14,14 +13,13 @@ namespace Xappium.UITest.Pages
         protected BasePage()
         {
             PageName = GetType().Name;
-            AssertOnPage(TimeSpan.FromSeconds(30));
+            AssertOnPage();
         }
 
         /// <summary>
         /// Verifies that the trait is still present. Defaults to no wait.
         /// </summary>
-        /// <param name="timeout">Time to wait before the assertion fails</param>
-        protected void AssertOnPage(TimeSpan? timeout = default)
+        protected void AssertOnPage()
         {
             var message = "Unable to verify on page: " + PageName;
 
@@ -33,10 +31,9 @@ namespace Xappium.UITest.Pages
         /// <summary>
         /// Verifies that the trait is no longer present. Defaults to a 5 second wait.
         /// </summary>
-        /// <param name="timeout">Time to wait before the assertion fails</param>
-        protected void WaitForPageToLeave(TimeSpan? timeout = default)
+        protected void WaitForPageToLeave()
         {
-            timeout = timeout ?? TimeSpan.FromSeconds(5);
+            //timeout = timeout ?? TimeSpan.FromSeconds(5);
             var message = "Unable to verify *not* on page: " + PageName;
 
             Engine.WaitForNoElement(Trait);
