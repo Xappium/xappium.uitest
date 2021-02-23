@@ -59,8 +59,9 @@ namespace Xappium.UITest
                 AddAdditionalCapability(options, MobileCapabilityType.PlatformName, "iOS");
                 AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "XCUITest");
                 AddAdditionalCapability(options, "autoAcceptAlerts", true);
+                AddAdditionalCapability(options, "isHeadless", true);
 
-                Driver = new IOSDriver<AppiumWebElement>(url, options, TimeSpan.FromSeconds(20));
+                Driver = new IOSDriver<AppiumWebElement>(url, options, TimeSpan.FromSeconds(60));
             }
             else if (Platform == Platform.Android)
             {
