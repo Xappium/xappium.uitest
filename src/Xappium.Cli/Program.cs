@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Xappium.Android;
 using Xappium.Apple;
+using Xappium.BuildSystem;
 using Xappium.Tools;
 
 [assembly: InternalsVisibleTo("Xappium.Cli.Tests")]
@@ -79,7 +80,9 @@ namespace Xappium
                 headBin += Path.DirectorySeparatorChar;
                 uiTestBin += Path.DirectorySeparatorChar;
 
-                await BuildHeadProject(headBin).ConfigureAwait(false);
+                await CSProjFile.Load(DeviceProjectPathInfo, new DirectoryInfo(uiTestBin), Platform)
+                    .Build(Configuration)
+                    .ConfigureAwait(false);
                 await BuildUITestProject(uiTestBin).ConfigureAwait(false);
 
                 GenerateTestConfig(headBin, uiTestBin);
@@ -129,39 +132,6 @@ namespace Xappium
                 throw new FileNotFoundException($"The specified UI Test project path does not exist: '{UITestProjectPath}'");
             else if (!DeviceProjectPathInfo.Exists)
                 throw new FileNotFoundException($"The specified Platform head project path does not exist: '{DeviceProjectPath}'");
-        }
-
-        private async Task BuildHeadProject(string headBin)
-        {
-            var props = new Dictionary<string, string>
-            {
-                { "OutputPath", headBin }
-            };
-            if (!string.IsNullOrEmpty(Configuration))
-                props.Add("Configuration", Configuration);
-
-            Console.WriteLine("Building Platform head project");
-
-            await NuGet.Restore(DeviceProjectPathInfo.FullName).ConfigureAwait(false);
-
-            switch (Platform)
-            {
-                case "Android":
-                    // msbuild ../sample/TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:AndroidSupportedAbis=x86 /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
-                    props.Add("AndroidPackageFormat", "apk");
-                    props.Add("AndroidSupportedAbis", "x86");
-                    await MSBuild.Build(DeviceProjectPathInfo.FullName, baseWorkingDirectory, props, "SignAndroidPackage").ConfigureAwait(false);
-                    break;
-                case "iOS":
-                    // msbuild ../sample/TestApp.iOS/TestApp.iOS.csproj /p:Platform=iPhoneSimulator /p:Configuration=Release /p:OutputPath=$UITESTPATH/bin/
-                    props.Add("Platform", "iPhoneSimulator");
-                    await MSBuild.Build(DeviceProjectPathInfo.FullName, baseWorkingDirectory, props).ConfigureAwait(false);
-                    break;
-                default:
-                    if (string.IsNullOrEmpty(Platform))
-                        throw new Exception("The platform argument must be specified.");
-                    throw new PlatformNotSupportedException($"We do not currently support {Platform}");
-            }
         }
 
         private async Task BuildUITestProject(string uiTestBin)

@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources/*.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Xappium.Cli\Xappium.Cli.csproj" />
   </ItemGroup>
 </Project>

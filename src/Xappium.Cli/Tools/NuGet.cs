@@ -7,7 +7,6 @@ namespace Xappium.Tools
 {
     public static class NuGet
     {
-        
         public static async Task Restore(string path)
         {
             Console.WriteLine($"Restoring Project: {path}");

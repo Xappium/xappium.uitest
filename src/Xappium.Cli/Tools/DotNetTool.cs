@@ -9,16 +9,10 @@ namespace Xappium.Tools
 {
     internal static class DotNetTool
     {
-        public static async Task Test(string projectPath, string outputPath, string configuration, string resultsDirectory)
+        public static Task Test(string projectPath, string outputPath, string configuration, string resultsDirectory)
         {
             if (string.IsNullOrEmpty(configuration))
                 configuration = "Release";
-
-            var stdErrBuffer = new StringBuilder();
-            var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
-            var stdErr = PipeTarget.Merge(
-                PipeTarget.ToStringBuilder(stdErrBuffer),
-                PipeTarget.ToDelegate(l => Console.WriteLine(l)));
 
             var args = new ArgumentsBuilder().Add("test")
                      .Add($"{projectPath}")
@@ -27,16 +21,38 @@ namespace Xappium.Tools
                      .Add("--no-build")
                      .Add($"--results-directory={resultsDirectory}")
                      .Add("--logger=trx")
+                     .Add("--diag:logs/log.txt")
+                     //.Add("--verbosity=diagnostic")
                      .Build();
 
             Console.WriteLine($"Running dotnet test on '{projectPath}'");
             Console.WriteLine($"{DotNetExe.FullPath} {args}");
-            var result = await Cli.Wrap("dotnet")
+
+            return Execute(args);
+        }
+
+        public static Task Build(Action<ArgumentsBuilder> configure)
+        {
+            var builder = new ArgumentsBuilder()
+                .Add("build");
+            configure(builder);
+
+            return Execute(builder.Build());
+        }
+
+        private static async Task Execute(string args)
+        {
+            var stdErrBuffer = new StringBuilder();
+            var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
+            var stdErr = PipeTarget.Merge(
+                PipeTarget.ToStringBuilder(stdErrBuffer),
+                PipeTarget.ToDelegate(l => Console.WriteLine(l)));
+
+            var result = await Cli.Wrap(DotNetExe.FullPath)
                 .WithArguments(args)
                 .WithStandardErrorPipe(stdOut)
                 .WithStandardErrorPipe(stdErr)
                 .WithValidation(CommandResultValidation.None)
-                .WithWorkingDirectory(outputPath)
                 .ExecuteAsync()
                 .ConfigureAwait(false);
 
