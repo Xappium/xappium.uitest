@@ -1,9 +1,12 @@
 ﻿using System.Drawing;
+using OpenQA.Selenium.Interactions.Internal;
 
 namespace Xappium.UITest
 {
     public interface IUIElement
     {
+        ICoordinates Coordinates { get; }
+
         bool Displayed { get; }
 
         bool Enabled { get; }
@@ -13,6 +16,8 @@ namespace Xappium.UITest
         string Text { get; }
 
         Point Location { get; }
+
+        Point LocationOnScreenOnceScrolledIntoView { get; }
 
         Size Size { get; }
 

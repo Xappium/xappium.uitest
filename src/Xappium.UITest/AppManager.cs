@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using Xappium.UITest.Configuration;
+using Xappium.UITest.Platforms;
 
 namespace Xappium.UITest
 {
@@ -48,17 +49,13 @@ namespace Xappium.UITest
                 (!File.Exists(testConfig.AppPath) && testConfig.Platform == Platform.Android))
                 throw new FileNotFoundException($"The App Package could not be found at the specified location. '{testConfig.AppPath}'");
 
-            switch (testConfig.Platform)
+            _engine = testConfig.Platform switch
             {
-                case Platform.NotSet:
-                    throw new NotSupportedException("The platform has not been set in the test config. You must select a valid platform");
-                case Platform.Android:
-                case Platform.iOS:
-                    _engine = new XappiumTestEngine(testConfig);
-                    break;
-                default:
-                    throw new PlatformNotSupportedException($"The selected platform {testConfig.Platform} is not currently implemented");
-            }
+                Platform.NotSet => throw new NotSupportedException("The platform has not been set in the test config. You must select a valid platform"),
+                Platform.Android => new AndroidXappiumTestEngine(testConfig),
+                Platform.iOS => new iOSXappiumTestEngine(testConfig),
+                _ => throw new PlatformNotSupportedException($"The selected platform {testConfig.Platform} is not currently implemented"),
+            };
         }
 
         internal static void AppStopped()
