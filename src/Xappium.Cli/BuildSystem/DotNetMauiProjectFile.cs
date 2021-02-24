@@ -31,5 +31,15 @@ namespace Xappium.BuildSystem
                      .Add($"--output={OutputDirectory.FullName}")
                      .Add($"--configuration={configuration}"));
         }
+
+        public override Task<bool> IsSupported()
+        {
+            return (Platform.ToLower()) switch
+            {
+                "android" => Task.FromResult(EnvironmentHelper.IsAndroidSupported),
+                "ios" => Task.FromResult(EnvironmentHelper.IsIOSSupported),
+                _ => Task.FromResult(false),
+            };
+        }
     }
 }

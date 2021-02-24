@@ -29,5 +29,10 @@ namespace Xappium.BuildSystem
             // msbuild ../sample/TestApp.iOS/TestApp.iOS.csproj /p:Platform=iPhoneSimulator /p:Configuration=Release /p:OutputPath=$UITESTPATH/bin/
             await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.Parent.FullName, props).ConfigureAwait(false);
         }
+
+        public override Task<bool> IsSupported()
+        {
+            return Task.FromResult(EnvironmentHelper.IsIOSSupported);
+        }
     }
 }

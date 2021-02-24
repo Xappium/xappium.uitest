@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
@@ -12,7 +11,6 @@ using Xappium.Apple;
 using Xappium.BuildSystem;
 using Xappium.Tools;
 
-[assembly: InternalsVisibleTo("Xappium.Cli.Tests")]
 namespace Xappium
 {
     internal class Program
@@ -93,6 +91,9 @@ namespace Xappium
                 uiTestBin += Path.DirectorySeparatorChar;
 
                 var appProject = CSProjFile.Load(DeviceProjectPathInfo, new DirectoryInfo(headBin), Platform);
+                if (!await appProject.IsSupported())
+                    throw new PlatformNotSupportedException($"{appProject.Platform} is not supported on this machine. Please check that you have the correct build dependencies.");
+
                 await appProject.Build(Configuration).ConfigureAwait(false);
                 await BuildUITestProject(uiTestBin).ConfigureAwait(false);
 

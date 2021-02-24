@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Xappium.UITest;
 using Xappium.UITest.Pages;
 using Xunit;
 

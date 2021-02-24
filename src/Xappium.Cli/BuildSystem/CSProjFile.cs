@@ -27,6 +27,8 @@ namespace Xappium.BuildSystem
 
         public abstract Task Build(string configuration);
 
+        public abstract Task<bool> IsSupported();
+
         public static CSProjFile Load(FileInfo projectFile, DirectoryInfo outputDirectory, string platform)
         {
             var errorMessage = $"The Project file '{projectFile.FullName}' is not supported";

@@ -1,14 +1,11 @@
 ﻿using System;
+using Xappium.UITest;
 using Xappium.UITest.Pages;
 
 namespace TestApp.UITests.Pages
 {
     public class MainPage : BasePage
     {
-        public MainPage()
-        {
-        }
-
         protected override string Trait => "WelcomeMessage";
 
         public MainPage ValidateWelcomeMessage()

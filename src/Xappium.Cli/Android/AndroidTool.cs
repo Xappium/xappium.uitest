@@ -46,7 +46,7 @@ namespace Xappium.Android
                 Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "platform-tools"),
             };
 
-        static AndroidTool()
+        public static void ValidateEnvironmentSettings()
         {
             var androidHome = Environment.GetEnvironmentVariable("ANDROID_HOME");
             if (string.IsNullOrEmpty(androidHome))
@@ -112,7 +112,7 @@ namespace Xappium.Android
 
         internal static void ThrowIfNull(string path, string name)
         {
-            
+            ValidateEnvironmentSettings();
 
             if (string.IsNullOrEmpty(path))
                 throw new Exception($"No path was found for {name}. Be sure that the ANDROID_HOME or JAVA_HOME has been set and that the adb, sdkmanager, and emulator tools are installed");

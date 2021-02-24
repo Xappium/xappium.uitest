@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -35,12 +35,10 @@ namespace Xappium.UITest.Platforms
             var options = new AppiumOptions();
             ConfigureCapabilities(options);
 
-            var url = _config.AppiumServer;
             Driver = CreateDriver(options, _config);
 
             // Setup timeouts
             Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(SHORT_TIMEOUT);
-            
         }
 
         protected abstract T CreateDriver(AppiumOptions options, UITestConfiguration config);

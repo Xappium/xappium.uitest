@@ -25,5 +25,10 @@ namespace Xappium.BuildSystem
                      .Add($"--output={OutputDirectory.FullName}")
                      .Add($"--configuration={configuration}"));
         }
+
+        public override Task<bool> IsSupported()
+        {
+            return Task.FromResult(true);
+        }
     }
 }
