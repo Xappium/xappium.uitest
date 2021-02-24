@@ -16,7 +16,10 @@ namespace Xappium
 
         public string Error { get; }
 
-        public bool IsErred => !string.IsNullOrEmpty(Error.Trim()) &&
-            Error.Split(Environment.NewLine).Any(x => !x.StartsWith("Warning", StringComparison.InvariantCultureIgnoreCase));
+        public bool IsErred =>
+            !string.IsNullOrEmpty(Error.Trim()) &&
+            Error.Trim()
+                 .Split(Environment.NewLine)
+                 .Any(x => !x.StartsWith("Warning", StringComparison.InvariantCultureIgnoreCase));
     }
 }
