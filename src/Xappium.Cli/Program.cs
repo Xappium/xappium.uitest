@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -18,6 +18,8 @@ namespace Xappium
     internal class Program
     {
         private const string ConfigFileName = "uitest.json";
+
+        private int sdkVersion = 29;
 
         private FileInfo UITestProjectPathInfo => string.IsNullOrEmpty(UITestProjectPath) ? null : new FileInfo(UITestProjectPath);
 
@@ -93,6 +95,9 @@ namespace Xappium
                 var appProject = CSProjFile.Load(DeviceProjectPathInfo, new DirectoryInfo(headBin), Platform);
                 await appProject.Build(Configuration).ConfigureAwait(false);
                 await BuildUITestProject(uiTestBin).ConfigureAwait(false);
+
+                if (appProject is DotNetMauiProjectFile && appProject.Platform == "Android")
+                    sdkVersion = 30;
 
                 GenerateTestConfig(headBin, uiTestBin, appProject.Platform);
 
@@ -207,7 +212,6 @@ namespace Xappium
                     // Check for connected device
                     if (!Adb.DeviceIsConnected())
                     {
-                        var sdkVersion = 29;
                         // Ensure SDK Installed
                         SdkManager.EnsureSdkIsInstalled(sdkVersion);
 
