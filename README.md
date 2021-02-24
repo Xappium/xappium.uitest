@@ -12,13 +12,14 @@ This repo is currently evolving and may experience breaking API changes. Communi
 
 | Description | Status |
 |-------------|:------:|
-| iOS Support | Partially working |
+| iOS Support | Done |
 | Android Support | In process |
 | WinUI Support | PR Welcome |
 | GTK Support | PR Welcome |
 | macOS Support | PR Welcome |
 | Tizen Support | PR Welcome |
-| CLI tool | In process |
+| CLI tool | Done |
+| Azure Pipelines | Needs Help |
 
 ## Configuration
 
