@@ -23,7 +23,7 @@ namespace Xappium.Tools
                      .Add($"--configuration={configuration}")
                      .Add("--no-build")
                      .Add($"--results-directory={resultsDirectory}")
-                     .Add("--logger=trx")
+                     .Add($"--logger:trx;LogFileName={Path.GetFileNameWithoutExtension(projectPath)}.trx")
                      .Add($"--diag:{logFile}")
                      .Build();
 

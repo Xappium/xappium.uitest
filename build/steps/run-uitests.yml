@@ -15,20 +15,20 @@ steps:
 
 - bash: |
     export DOTNET_CLI_TELEMETRY_OPTOUT=true
+    ARTIFACT_DIR=$PIPELINE_WORKSPACE/UITests
     VERSION=$(cd $PIPELINE_WORKSPACE; ls Xappium.Cli.*.nupkg | perl -nle 'm/Xappium\.Cli\.(.*)\.nupkg/; print $1')
     echo "Installing Xappium.Cli version $VERSION from $PIPELINE_WORKSPACE"
+    touch "$DOTNET_CLI_HOME/.dotnet/$(dotnet --version).dotnetFirstUseSentinel"
     dotnet tool install -g Xappium.Cli --version $VERSION --add-source $PIPELINE_WORKSPACE
-    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }} --show-config -artifacts $BUILD_ARTIFACTSTAGINGDIRECTORY
-    rm $BUILD_ARTIFACTSTAGINGDIRECTORY/*.nupkg
-    rm $BUILD_ARTIFACTSTAGINGDIRECTORY/*.snupkg
-  displayName: Run UI Tests
+    xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }} --show-config -artifacts $ARTIFACT_DIR
+  displayName: Run Xappium Tests
 
 - task: PublishTestResults@2
   condition: always()
   inputs:
-    testRunTitle: '${{ parameters.platform }} Test Run'
-    testResultsFormat: 'XUnit'
-    testResultsFiles: '$(Build.ArtifactStagingDirectory)/**/*.trx'
+    testRunTitle: '${{ parameters.platform }} UI Tests'
+    testResultsFormat: XUnit
+    testResultsFiles: '$(Pipeline.Workspace)/UITests/results/TestApp.UITests.trx'
     failTaskOnFailedTests: true
 
 - task: PublishPipelineArtifact@1
@@ -36,4 +36,4 @@ steps:
   condition: always()
   inputs:
     artifact: ${{ parameters.platform }}-uitest
-    targetPath: $(Build.ArtifactStagingDirectory)
+    targetPath: $(Pipeline.Workspace)/UITests

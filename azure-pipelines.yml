@@ -104,7 +104,7 @@ stages:
 
   - stage: deploy
     displayName: Deploy Artifacts
-    condition: always()
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['system.pullrequest.isfork'], false))
     jobs:
       - deployment: sponsorConnect
         displayName: Sponsor Connect
