@@ -19,6 +19,8 @@ steps:
     echo "Installing Xappium.Cli version $VERSION from $PIPELINE_WORKSPACE"
     dotnet tool install -g Xappium.Cli --version $VERSION --add-source $PIPELINE_WORKSPACE
     xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app ${{ parameters.projectPath }} --show-config -artifacts $BUILD_ARTIFACTSTAGINGDIRECTORY
+    rm $BUILD_ARTIFACTSTAGINGDIRECTORY/*.nupkg
+    rm $BUILD_ARTIFACTSTAGINGDIRECTORY/*.snupkg
   displayName: Run UI Tests
 
 - task: PublishTestResults@2
@@ -26,7 +28,7 @@ steps:
   inputs:
     testRunTitle: '${{ parameters.platform }} Test Run'
     testResultsFormat: 'XUnit'
-    testResultsFiles: '**/*.trx'
+    testResultsFiles: '$(Build.ArtifactStagingDirectory)/**/*.trx'
     failTaskOnFailedTests: true
 
 - task: PublishPipelineArtifact@1

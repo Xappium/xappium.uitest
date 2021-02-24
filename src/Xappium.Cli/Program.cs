@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -99,7 +99,7 @@ namespace Xappium
                 Appium.Install();
                 appium = await Appium.Run(BaseWorkingDirectory).ConfigureAwait(false);
 
-                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "Results"))
+                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "results"))
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -118,11 +118,9 @@ namespace Xappium
             {
                 appium?.Dispose();
 
-#if !DEBUG
                 var binDir = Path.Combine(BaseWorkingDirectory, "bin");
                 if(Directory.Exists(binDir))
                     Directory.Delete(binDir, true);
-#endif
             }
 
             return 0;
@@ -198,7 +196,7 @@ namespace Xappium
             config.AppPath = appPath;
 
             if (string.IsNullOrEmpty(config.ScreenshotsPath))
-                config.ScreenshotsPath = Path.Combine(BaseWorkingDirectory, "Screenshots");
+                config.ScreenshotsPath = Path.Combine(BaseWorkingDirectory, "screenshots");
 
             switch(platform)
             {
