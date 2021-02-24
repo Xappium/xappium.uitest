@@ -27,7 +27,7 @@ steps:
   condition: always()
   inputs:
     testRunTitle: '${{ parameters.platform }} UI Tests'
-    testResultsFormat: XUnit
+    testResultsFormat: VSTest
     testResultsFiles: '$(Pipeline.Workspace)/UITests/results/TestApp.UITests.trx'
     failTaskOnFailedTests: true
 
