@@ -18,7 +18,7 @@ namespace Xappium.UITest
 
         void StopApp();
 
-        void Tap(string automationId);
+        void Tap(string automationId, TimeSpan? timeout);
 
         void TapAtIndex(string automationId, int index);
 
@@ -34,17 +34,17 @@ namespace Xappium.UITest
 
         void DismissKeyboard();
 
-        IUIElement EnterText(string automationId, string text);
+        IUIElement EnterText(string automationId, string text, TimeSpan? timeout);
 
-        IUIElement WaitForElementWithText(string text);
+        IUIElement WaitForElementWithText(string text, TimeSpan? timeout);
 
-        void WaitForNoElementWithText(string text);
+        void WaitForNoElementWithText(string text, TimeSpan? timeout);
 
-        IUIElement WaitForElement(string automationId);
+        IUIElement WaitForElement(string automationId, TimeSpan? timeout);
 
-        void WaitForNoElement(string automationId);
+        void WaitForNoElement(string automationId, TimeSpan? timeout);
 
-        void AssertTextInElementByAutomationId(string automationId, string text);
+        void AssertTextInElementByAutomationId(string automationId, string text, TimeSpan? timeout);
 
         void ScrollTo(string automationId);
 
@@ -54,7 +54,7 @@ namespace Xappium.UITest
 
         IEnumerable<IUIElement> WaitForAnyElement(params string[] automationIds);
 
-        bool ElementExists(string automationId);
+        bool ElementExists(string automationId, TimeSpan? timeout);
 
         void BackButton();
     }

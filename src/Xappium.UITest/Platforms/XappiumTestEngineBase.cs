@@ -40,12 +40,17 @@ namespace Xappium.UITest.Platforms
 
             // Setup timeouts
             Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(SHORT_TIMEOUT);
-            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(LONG_TIMEOUT));
+            
         }
 
         protected abstract T CreateDriver(AppiumOptions options, UITestConfiguration config);
 
         protected abstract IUIElement CreateUIElement(E nativeElement);
+
+        protected WebDriverWait Wait(TimeSpan? timeout = null)
+        {
+            return new WebDriverWait(Driver, timeout ?? TimeSpan.FromSeconds(LONG_TIMEOUT));
+        }
 
         public IReadOnlyDictionary<string, string> Settings => _config.Settings;
 
@@ -53,8 +58,6 @@ namespace Xappium.UITest.Platforms
             => StopApp();
 
         protected T Driver { get; private set; }
-
-        protected WebDriverWait Wait { get; private set; }
 
         public Platform Platform => _config.Platform;
 
@@ -78,12 +81,11 @@ namespace Xappium.UITest.Platforms
             {
                 Driver.Quit();
                 Driver = null;
-                Wait = null;
                 AppManager.AppStopped();
             }
         }
 
-        public virtual void Tap(string automationId) =>
+        public virtual void Tap(string automationId, TimeSpan? timeout) =>
             Driver.FindElement(ByAutomationId(automationId))
                 .Click();
 
@@ -153,34 +155,34 @@ namespace Xappium.UITest.Platforms
         public virtual void DismissKeyboard() =>
             Driver.HideKeyboard();
 
-        public virtual IUIElement EnterText(string automationId, string text)
+        public virtual IUIElement EnterText(string automationId, string text, TimeSpan? timeout)
         {
             var element = Driver.FindElement(ByAutomationId(automationId));
             element.SendKeys(text);
             return CreateUIElement(element);
         }
 
-        public virtual IUIElement WaitForElementWithText(string text)
+        public virtual IUIElement WaitForElementWithText(string text, TimeSpan? timeout)
         {
             var query = MobileBy.XPath("//*[@text='" + text + "']");
-            Wait.Until(w => w.FindElement(query));
+            Wait(timeout).Until(w => w.FindElement(query));
             return CreateUIElement(Driver.FindElement(query));
         }
 
-        public virtual void WaitForNoElementWithText(string text) =>
-            Wait.Until(w => w.FindElements(MobileBy.XPath("//*[@text='" + text + "']")).Count <= 0);
+        public virtual void WaitForNoElementWithText(string text, TimeSpan? timeout) =>
+            Wait(timeout).Until(w => w.FindElements(MobileBy.XPath("//*[@text='" + text + "']")).Count <= 0);
 
-        public virtual IUIElement WaitForElement(string automationId)
+        public virtual IUIElement WaitForElement(string automationId, TimeSpan? timeout)
         {
             var query = ByAutomationId(automationId);
-            Wait.Until(w => w.FindElement(query));
+            Wait(timeout).Until(w => w.FindElement(query));
             return CreateUIElement(Driver.FindElement(query));
         }
 
-        public virtual void WaitForNoElement(string automationId) =>
-            Wait.Until(w => w.FindElements(ByAutomationId(automationId)).Count <= 0);
+        public virtual void WaitForNoElement(string automationId, TimeSpan? timeout) =>
+            Wait(timeout).Until(w => w.FindElements(ByAutomationId(automationId)).Count <= 0);
 
-        public virtual void AssertTextInElementByAutomationId(string automationId, string text)
+        public virtual void AssertTextInElementByAutomationId(string automationId, string text, TimeSpan? timeout)
         {
             var found = false;
             foreach (var elem in Driver.FindElements(ByAutomationId(automationId)))
@@ -205,7 +207,7 @@ namespace Xappium.UITest.Platforms
 
         public virtual IEnumerable<IUIElement> WaitForAnyElement(params string[] automationIds)
         {
-            Wait.Until(w =>
+            Wait().Until(w =>
                 automationIds.Any(id => w.FindElements(ByAutomationId(id)).Any())
             );
             return automationIds.Select(x =>
@@ -213,7 +215,7 @@ namespace Xappium.UITest.Platforms
             );
         }
 
-        public virtual bool ElementExists(string automationId) =>
+        public virtual bool ElementExists(string automationId, TimeSpan? timeout) =>
             Driver.FindElements(ByAutomationId(automationId)).Any();
 
         public virtual void BackButton() =>
