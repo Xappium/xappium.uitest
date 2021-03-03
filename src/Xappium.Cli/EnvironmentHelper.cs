@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xappium.Android;
@@ -13,6 +14,8 @@ namespace Xappium
         public static readonly bool IsAndroidSupported = IsAndroidSupportedInternal();
 
         public static readonly bool IsIOSSupported = IsIOSSupportedInternal();
+
+        private static readonly string[] s_systemPaths = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
 
         //From Managed.Windows.Forms/XplatUI
         [DllImport("libc")]
@@ -63,6 +66,18 @@ namespace Xappium
             catch { }
 
             return false;
+        }
+
+        public static string GetToolPath(string toolName)
+        {
+            return s_systemPaths.SelectMany(x => new[]
+                {
+                    Path.Combine(x, toolName),
+                    Path.Combine(x, $"{toolName}.exe"),
+                    Path.Combine(x, $"{toolName}.bat")
+                })
+                .Where(x => File.Exists(x))
+                .FirstOrDefault();
         }
     }
 }

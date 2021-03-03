@@ -85,6 +85,10 @@ namespace Xappium.Android
 
         internal static string LocateUtility(string fileName)
         {
+            var path = EnvironmentHelper.GetToolPath(fileName);
+            if (!string.IsNullOrEmpty(path))
+                return path;
+
             foreach (var dir in s_searchPaths)
             {
                 var file = LocateInternal(dir, fileName);

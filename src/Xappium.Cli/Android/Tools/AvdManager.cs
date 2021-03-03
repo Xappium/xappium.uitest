@@ -17,9 +17,6 @@ namespace Xappium.Android
         {
             ThrowIfNull(ToolPath, nameof(AvdManager));
 
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                throw new PlatformNotSupportedException("Installing the Enumlator is not supported on Windows");
-
             var device = GetDevices()
                 .Where(x => Regex.IsMatch(x, @"^pixel_\d$"))
                 .OrderByDescending(x => x)

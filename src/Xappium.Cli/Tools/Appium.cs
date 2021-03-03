@@ -52,7 +52,9 @@ namespace Xappium.Tools
                 PipeTarget.ToFile(Path.Combine(logDirectory, "appium-error.log")),
                 PipeTarget.ToDelegate(CompleteTask));
             Console.WriteLine("Starting Appium...");
-            var cmd = Cli.Wrap("appium")
+
+            var toolPath = EnvironmentHelper.GetToolPath("appium");
+            var cmd = Cli.Wrap(toolPath)
                 .WithStandardOutputPipe(stdOut)
                 .WithStandardErrorPipe(stdErr)
                 .WithValidation(CommandResultValidation.None)
