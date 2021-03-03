@@ -96,7 +96,9 @@ namespace Xappium
                     throw new PlatformNotSupportedException($"{appProject.Platform} is not supported on this machine. Please check that you have the correct build dependencies.");
 
                 await appProject.Build(Configuration, cancellationToken).ConfigureAwait(false);
-                await BuildUITestProject(uiTestBin, cancellationToken).ConfigureAwait(false);
+
+                var uitestProj = CSProjFile.Load(UITestProjectPathInfo, new DirectoryInfo(uiTestBin), string.Empty);
+                await uitestProj.Build(Configuration, cancellationToken).ConfigureAwait(false);
 
                 if (cancellationToken.IsCancellationRequested)
                     return 0;
@@ -146,20 +148,6 @@ namespace Xappium
                 throw new FileNotFoundException($"The specified UI Test project path does not exist: '{UITestProjectPath}'");
             else if (!DeviceProjectPathInfo.Exists)
                 throw new FileNotFoundException($"The specified Platform head project path does not exist: '{DeviceProjectPath}'");
-        }
-
-        private async Task BuildUITestProject(string uiTestBin, CancellationToken cancellationToken)
-        {
-            var props = new Dictionary<string, string>
-            {
-                { "OutputPath", uiTestBin }
-            };
-
-            if (!string.IsNullOrEmpty(Configuration))
-                props.Add("Configuration", Configuration);
-
-            await NuGet.Restore(UITestProjectPathInfo.FullName, cancellationToken).ConfigureAwait(false);
-            await MSBuild.Build(UITestProjectPathInfo.FullName, BaseWorkingDirectory, props, cancellationToken).ConfigureAwait(false);
         }
 
         private void GenerateTestConfig(string headBin, string uiTestBin, string platform)
