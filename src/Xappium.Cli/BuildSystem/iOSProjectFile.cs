@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xappium.Tools;
 
@@ -16,7 +17,7 @@ namespace Xappium.BuildSystem
 
         public override string Platform => "iOS";
 
-        public override async Task Build(string configuration)
+        public override async Task Build(string configuration, CancellationToken cancellationToken)
         {
             var outputPath = OutputDirectory.FullName + Path.DirectorySeparatorChar;
             var props = new Dictionary<string, string>
@@ -27,7 +28,7 @@ namespace Xappium.BuildSystem
             };
 
             // msbuild ../sample/TestApp.iOS/TestApp.iOS.csproj /p:Platform=iPhoneSimulator /p:Configuration=Release /p:OutputPath=$UITESTPATH/bin/
-            await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.Parent.FullName, props).ConfigureAwait(false);
+            await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.Parent.FullName, props, cancellationToken).ConfigureAwait(false);
         }
 
         public override Task<bool> IsSupported()

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -25,7 +26,7 @@ namespace Xappium.BuildSystem
 
         public abstract string Platform { get; }
 
-        public abstract Task Build(string configuration);
+        public abstract Task Build(string configuration, CancellationToken cancellationToken);
 
         public abstract Task<bool> IsSupported();
 

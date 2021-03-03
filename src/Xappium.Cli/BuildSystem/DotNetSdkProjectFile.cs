@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xappium.Tools;
 
@@ -13,7 +14,7 @@ namespace Xappium.BuildSystem
 
         public override string Platform => ".NET";
 
-        public override Task Build(string configuration)
+        public override Task Build(string configuration, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(configuration))
                 configuration = "Release";
@@ -23,7 +24,7 @@ namespace Xappium.BuildSystem
                     b.Add("build")
                      .Add($"{ProjectFile.FullName}")
                      .Add($"--output={OutputDirectory.FullName}")
-                     .Add($"--configuration={configuration}"));
+                     .Add($"--configuration={configuration}"), cancellationToken);
         }
 
         public override Task<bool> IsSupported()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CliWrap;
 
@@ -7,7 +8,7 @@ namespace Xappium.Tools
 {
     public static class NuGet
     {
-        public static async Task Restore(string path)
+        public static async Task Restore(string path, CancellationToken cancellationToken)
         {
             Console.WriteLine($"Restoring Project: {path}");
             var stdErrBuffer = new StringBuilder();
@@ -19,7 +20,7 @@ namespace Xappium.Tools
                 })
                 .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Console.WriteLine(l)))
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-                .ExecuteAsync()
+                .ExecuteAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             var error = stdErrBuffer.ToString().Trim();

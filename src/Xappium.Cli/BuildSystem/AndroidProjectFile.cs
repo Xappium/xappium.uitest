@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xappium.Android;
 using Xappium.Tools;
@@ -15,7 +16,7 @@ namespace Xappium.BuildSystem
 
         public override string Platform => "Android";
 
-        public override async Task Build(string configuration)
+        public override async Task Build(string configuration, CancellationToken cancellationToken)
         {
             var props = new Dictionary<string, string>
             {
@@ -26,7 +27,7 @@ namespace Xappium.BuildSystem
             };
 
             // msbuild ../sample/TestApp.Android/TestApp.Android.csproj /p:Configuration=Release /p:AndroidPackageFormat=apk /p:AndroidSupportedAbis=x86 /p:OutputPath=$UITESTPATH/bin/ /t:SignAndroidPackage
-            await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.Parent.FullName, props, "SignAndroidPackage").ConfigureAwait(false);
+            await MSBuild.Build(ProjectFile.FullName, OutputDirectory.Parent.Parent.FullName, props, cancellationToken, "SignAndroidPackage").ConfigureAwait(false);
         }
 
         public override Task<bool> IsSupported() =>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CliWrap;
 using CliWrap.Builders;
@@ -10,7 +11,7 @@ namespace Xappium.Tools
 {
     internal static class DotNetTool
     {
-        public static Task Test(string projectPath, string outputPath, string configuration, string resultsDirectory)
+        public static Task Test(string projectPath, string outputPath, string configuration, string resultsDirectory, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(configuration))
                 configuration = "Release";
@@ -30,19 +31,19 @@ namespace Xappium.Tools
             Console.WriteLine($"Running dotnet test on '{projectPath}'");
             Console.WriteLine($"{DotNetExe.FullPath} {args}");
 
-            return Execute(args);
+            return Execute(args, cancellationToken);
         }
 
-        public static Task Build(Action<ArgumentsBuilder> configure)
+        public static Task Build(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
         {
             var builder = new ArgumentsBuilder()
                 .Add("build");
             configure(builder);
 
-            return Execute(builder.Build());
+            return Execute(builder.Build(), cancellationToken);
         }
 
-        private static async Task Execute(string args)
+        private static async Task Execute(string args, CancellationToken cancellationToken)
         {
             var stdErrBuffer = new StringBuilder();
             var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
@@ -55,7 +56,7 @@ namespace Xappium.Tools
                 .WithStandardErrorPipe(stdOut)
                 .WithStandardErrorPipe(stdErr)
                 .WithValidation(CommandResultValidation.None)
-                .ExecuteAsync()
+                .ExecuteAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             var error = stdErrBuffer.ToString().Trim();

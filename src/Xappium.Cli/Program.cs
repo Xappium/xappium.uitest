@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Xappium.Android;
@@ -63,7 +64,7 @@ namespace Xappium
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members",
             Justification = "Called by McMaster")]
-        private async Task<int> OnExecuteAsync()
+        private async Task<int> OnExecuteAsync(CancellationToken cancellationToken)
         {
             IDisposable appium = null;
             try
@@ -94,8 +95,11 @@ namespace Xappium
                 if (!await appProject.IsSupported())
                     throw new PlatformNotSupportedException($"{appProject.Platform} is not supported on this machine. Please check that you have the correct build dependencies.");
 
-                await appProject.Build(Configuration).ConfigureAwait(false);
-                await BuildUITestProject(uiTestBin).ConfigureAwait(false);
+                await appProject.Build(Configuration, cancellationToken).ConfigureAwait(false);
+                await BuildUITestProject(uiTestBin, cancellationToken).ConfigureAwait(false);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return 0;
 
                 if (appProject is DotNetMauiProjectFile && appProject.Platform == "Android")
                     sdkVersion = 30;
@@ -105,7 +109,7 @@ namespace Xappium
                 Appium.Install();
                 appium = await Appium.Run(BaseWorkingDirectory).ConfigureAwait(false);
 
-                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "results"))
+                await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "results"), cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -144,7 +148,7 @@ namespace Xappium
                 throw new FileNotFoundException($"The specified Platform head project path does not exist: '{DeviceProjectPath}'");
         }
 
-        private async Task BuildUITestProject(string uiTestBin)
+        private async Task BuildUITestProject(string uiTestBin, CancellationToken cancellationToken)
         {
             var props = new Dictionary<string, string>
             {
@@ -154,8 +158,8 @@ namespace Xappium
             if (!string.IsNullOrEmpty(Configuration))
                 props.Add("Configuration", Configuration);
 
-            await NuGet.Restore(UITestProjectPathInfo.FullName).ConfigureAwait(false);
-            await MSBuild.Build(UITestProjectPathInfo.FullName, BaseWorkingDirectory, props).ConfigureAwait(false);
+            await NuGet.Restore(UITestProjectPathInfo.FullName, cancellationToken).ConfigureAwait(false);
+            await MSBuild.Build(UITestProjectPathInfo.FullName, BaseWorkingDirectory, props, cancellationToken).ConfigureAwait(false);
         }
 
         private void GenerateTestConfig(string headBin, string uiTestBin, string platform)

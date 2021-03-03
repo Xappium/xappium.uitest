@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CliWrap;
 
@@ -10,7 +11,7 @@ namespace Xappium.Tools
 {
     internal static class MSBuild
     {
-        public static async Task Build(string projectPath, string baseWorkingDirectory, IDictionary<string, string> props, string target = null)
+        public static async Task Build(string projectPath, string baseWorkingDirectory, IDictionary<string, string> props, CancellationToken cancellationToken, string target = null)
         {
             if (!props.ContainsKey("Configuration"))
                 props.Add("Configuration", "Release");
@@ -40,7 +41,7 @@ namespace Xappium.Tools
                 .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Console.WriteLine(l)))
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                 .WithValidation(CommandResultValidation.None)
-                .ExecuteAsync()
+                .ExecuteAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             var error = stdErrBuffer.ToString().Trim();
