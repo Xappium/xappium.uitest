@@ -8,9 +8,9 @@ namespace Xappium.Tools
 {
     internal static class Appium
     {
-        public static bool Install()
+        public static async Task<bool> Install(CancellationToken cancellationToken)
         {
-            return Node.IsInstalled && Node.InstallPackage("appium");
+            return Node.IsInstalled && await Node.InstallPackage("appium", cancellationToken).ConfigureAwait(false);
         }
 
         public static Task<IDisposable> Run(string baseWorkingDirectory)

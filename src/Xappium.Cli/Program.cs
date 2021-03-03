@@ -108,7 +108,11 @@ namespace Xappium
 
                 GenerateTestConfig(headBin, uiTestBin, appProject.Platform);
 
-                Appium.Install();
+                if(!await Appium.Install(cancellationToken))
+                {
+                    return 0;
+                }
+
                 appium = await Appium.Run(BaseWorkingDirectory).ConfigureAwait(false);
 
                 await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "results"), cancellationToken)

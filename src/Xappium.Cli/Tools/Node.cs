@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using CliWrap;
 
 namespace Xappium.Tools
 {
@@ -19,10 +23,25 @@ namespace Xappium.Tools
 
         public static bool IsInstalled => !string.IsNullOrEmpty(Version);
 
-        public static bool InstallPackage(string packageName)
+        public static async Task<bool> InstallPackage(string packageName, CancellationToken cancellationToken)
         {
-            var result = ProcessHelper.Run("npm", $"install -g {packageName}", displayRealtimeOutput: true);
-            return !result.IsErred;
+            Console.WriteLine($"npm install -g {packageName}");
+            var stdErrBuffer = new StringBuilder();
+            var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
+            await Cli.Wrap("npm")
+                .WithArguments($"install -g {packageName}")
+                .WithStandardOutputPipe(stdOut)
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .ExecuteAsync(cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+                return false;
+
+            var errorOutput = stdErrBuffer.ToString().Trim();
+            if (string.IsNullOrEmpty(errorOutput))
+                return true;
+
+            throw new Exception(errorOutput);
         }
     }
 }
