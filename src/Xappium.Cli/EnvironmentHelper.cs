@@ -15,8 +15,6 @@ namespace Xappium
 
         public static readonly bool IsIOSSupported = IsIOSSupportedInternal();
 
-        private static readonly string[] s_systemPaths = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
-
         //From Managed.Windows.Forms/XplatUI
         [DllImport("libc")]
         private static extern int uname(IntPtr buf);
@@ -70,7 +68,11 @@ namespace Xappium
 
         public static string GetToolPath(string toolName)
         {
-            return s_systemPaths.SelectMany(x => new[]
+            // For some reason this is null if we create a static readonly property.
+            var systemPaths = Environment.GetEnvironmentVariable("PATH")
+                                   .Split(Path.PathSeparator)
+                                   .Where(x => !string.IsNullOrEmpty(x) && Directory.Exists(x));
+            return systemPaths.SelectMany(x => new[]
                 {
                     Path.Combine(x, toolName),
                     Path.Combine(x, $"{toolName}.exe"),
