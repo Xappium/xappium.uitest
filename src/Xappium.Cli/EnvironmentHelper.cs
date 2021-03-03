@@ -46,8 +46,7 @@ namespace Xappium
             {
                 AndroidTool.ValidateEnvironmentSettings();
 
-                // TODO: This will need to be changed once Windows support is added
-                return IsRunningOnMac;
+                return !string.IsNullOrEmpty(SdkManager.ToolPath);
             }
             catch
             {

@@ -6,45 +6,61 @@ namespace Xappium.Android
 {
     internal static class AndroidTool
     {
-        private static readonly string s_userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        private static readonly string[] s_androidSdkPaths = new[]
+        static AndroidTool()
         {
-            Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk"),
-            Path.Combine(s_userProfile, "Library", "Android", "sdk"),
-            Path.Combine(s_userProfile, "android-toolchain", "sdk"),
-            Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk"),
-        };
-
-        private static readonly string[] s_searchPaths = new[]
+            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if(EnvironmentHelper.IsRunningOnMac)
             {
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk"),
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "cmdline-tools", "1.0", "bin"),
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "cmdline-tools", "latest", "bin"),
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "emulator"),
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "tools"),
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "tools", "bin"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk", "platform-tools"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk", "cmdline-tools", "1.0", "bin"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk", "cmdline-tools", "latest", "bin"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk", "emulator"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk", "tools"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk", "tools", "bin"),
-                Path.Combine(s_userProfile, "android-toolchain", "sdk", "platform-tools"),
-                Path.Combine(s_userProfile, "android-toolchain", "sdk", "cmdline-tools", "1.0", "bin"),
-                Path.Combine(s_userProfile, "android-toolchain", "sdk", "cmdline-tools", "latest", "bin"),
-                Path.Combine(s_userProfile, "android-toolchain", "sdk", "emulator"),
-                Path.Combine(s_userProfile, "android-toolchain", "sdk", "tools"),
-                Path.Combine(s_userProfile, "android-toolchain", "sdk", "tools", "bin"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk"),
-                Path.Combine(s_userProfile, "Library", "Android", "sdk"),
-                Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx", "cmdline-tools", "latest", "bin"),
-                Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx", "cmdline-tools", "current", "bin"),
-                Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx", "cmdline-tools", "1.0", "bin"),
-                Path.Combine(s_userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx"),
-                Path.Combine(s_userProfile, "AppData", "Local", "Android", "Sdk", "platform-tools"),
-            };
+                var result = ProcessHelper.Run("echo", "$(/usr/libexec/java_home)");
+                s_java_home = result.Output.FirstOrDefault();
+            }
+            else
+            {
+                s_java_home = new[]
+                {
+                    Path.Combine(programFiles, "Android"),
+                    Path.Combine(programFilesX86, "Android"),
+                }
+                .Where(x => Directory.Exists(x))
+                .SelectMany(x => Directory.EnumerateFiles(x, "java.exe", SearchOption.AllDirectories))
+                .Select(x => new FileInfo(x).Directory.FullName)
+                .FirstOrDefault();
+            }
+
+            s_androidSdkPaths = new[]
+                {
+                    Path.Combine(userProfile, "AppData", "Local", "Android", "Sdk"),
+                    Path.Combine(userProfile, "Library", "Android", "sdk"),
+                    Path.Combine(userProfile, "android-toolchain", "sdk"),
+                    Path.Combine(userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx"),
+                    Path.Combine(programFiles, "Android", "android-sdk"),
+                    Path.Combine(programFilesX86, "Android", "android-sdk"),
+                }
+                .Where(x => Directory.Exists(x))
+                .ToArray();
+
+            s_searchPaths = s_androidSdkPaths.SelectMany(x => new[]
+                {
+                    x,
+                    Path.Combine(x, "cmdline-tools", "latest", "bin"),
+                    Path.Combine(x, "cmdline-tools", "2.0", "bin"),
+                    Path.Combine(x, "cmdline-tools", "1.0", "bin"),
+                    Path.Combine(x, "emulator"),
+                    Path.Combine(x, "tools"),
+                    Path.Combine(x, "tools", "bin"),
+                    Path.Combine(x, "platform-tools")
+                })
+                .Where(x => Directory.Exists(x))
+                .ToArray();
+        }
+
+        private static readonly string s_java_home;
+
+        private static readonly string[] s_androidSdkPaths;
+
+        private static readonly string[] s_searchPaths;
 
         public static void ValidateEnvironmentSettings()
         {
@@ -58,26 +74,19 @@ namespace Xappium.Android
             var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
             if (string.IsNullOrWhiteSpace(javaHome))
             {
-                // TODO: This needs to be updated to support running on Windows.
-                var result = ProcessHelper.Run("echo", "$(/usr/libexec/java_home)");
-                javaHome = result.Output.FirstOrDefault() ?? throw new DirectoryNotFoundException("Could not locate the Java Home");
-                Environment.SetEnvironmentVariable("JAVA_HOME", javaHome, EnvironmentVariableTarget.Machine);
+                if(string.IsNullOrEmpty(s_java_home))
+                {
+                    throw new DirectoryNotFoundException("Could not locate the Java Home directory");
+                }
+
+                Environment.SetEnvironmentVariable("JAVA_HOME", s_java_home, EnvironmentVariableTarget.Machine);
             }
         }
 
         internal static string LocateUtility(string fileName)
         {
-            var path = new FileInfo(fileName);
-            if (path.Exists)
-                return path.FullName;
-
             foreach (var dir in s_searchPaths)
             {
-                if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir))
-                {
-                    continue;
-                }
-
                 var file = LocateInternal(dir, fileName);
 
                 if (!string.IsNullOrEmpty(file))
@@ -91,23 +100,15 @@ namespace Xappium.Android
 
         private static string LocateInternal(string dir, string fileName)
         {
-            var files = new[]
-            {
-                Path.Combine(dir, fileName),
-                Path.Combine(dir, "platform-tools", fileName),
-                Path.Combine(dir, "tools", fileName),
-                Path.Combine(dir, "tools", "bin", fileName),
-            };
-
-            foreach (var file in files)
-            {
-                if (File.Exists(file))
+            return new[]
                 {
-                    return file;
+                    new FileInfo(Path.Combine(dir, fileName)),
+                    new FileInfo(Path.Combine(dir, $"{fileName}.bat")),
+                    new FileInfo(Path.Combine(dir, $"{fileName}.exe")),
                 }
-            }
-
-            return null;
+                .Where(x => x.Exists)
+                .Select(x => x.FullName)
+                .FirstOrDefault();
         }
 
         internal static void ThrowIfNull(string path, string name)
