@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Xappium.UITest.Configuration;
 using Xappium.UITest.Platforms;
 
@@ -8,6 +9,8 @@ namespace Xappium.UITest
 {
     public static class AppManager
     {
+        public static readonly bool IsRunningOnMac = IsRunningOnMacInternal();
+
         static UITestConfiguration _testConfig;
         public static Platform Platform =>
             _testConfig is null || _testConfig.Platform == Platform.NotSet ?
@@ -53,7 +56,7 @@ namespace Xappium.UITest
             {
                 Platform.NotSet => throw new NotSupportedException("The platform has not been set in the test config. You must select a valid platform"),
                 Platform.Android => new AndroidXappiumTestEngine(testConfig),
-                Platform.iOS => new iOSXappiumTestEngine(testConfig),
+                Platform.iOS => IsRunningOnMac ? new iOSXappiumTestEngine(testConfig) : throw new PlatformNotSupportedException("iOS is only supported while running on a Mac host"),
                 _ => throw new PlatformNotSupportedException($"The selected platform {testConfig.Platform} is not currently implemented"),
             };
         }
@@ -62,6 +65,31 @@ namespace Xappium.UITest
         {
             _testConfig = null;
             _engine = null;
+        }
+
+        [DllImport("libc")]
+        private static extern int uname(IntPtr buf);
+        private static bool IsRunningOnMacInternal()
+        {
+            IntPtr buf = IntPtr.Zero;
+            try
+            {
+                buf = Marshal.AllocHGlobal(8192);
+                // This is a hacktastic way of getting sysname from uname ()
+                if (uname(buf) == 0)
+                {
+                    string os = Marshal.PtrToStringAnsi(buf);
+                    if (os == "Darwin")
+                        return true;
+                }
+            }
+            catch { }
+            finally
+            {
+                if (buf != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buf);
+            }
+            return false;
         }
     }
 }
