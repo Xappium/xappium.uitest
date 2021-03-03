@@ -26,8 +26,7 @@ namespace Xappium.BuildSystem
 
             // dotnet build HelloForms -t:Run -f net6.0-ios
             return DotNetTool.Build(b =>
-                    b.Add("build")
-                     .Add($"{ProjectFile.FullName}")
+                    b.Add($"{ProjectFile.FullName}")
                      .Add($"--framework={TargetFramework}")
                      .Add($"--output={OutputDirectory.FullName}")
                      .Add($"--configuration={configuration}"), cancellationToken);

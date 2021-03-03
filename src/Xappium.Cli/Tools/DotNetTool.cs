@@ -45,6 +45,7 @@ namespace Xappium.Tools
 
         private static async Task Execute(string args, CancellationToken cancellationToken)
         {
+            System.Console.WriteLine($"dotnet {args}");
             var stdErrBuffer = new StringBuilder();
             var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
             var stdErr = PipeTarget.Merge(
