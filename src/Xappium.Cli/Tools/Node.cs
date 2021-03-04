@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CliWrap;
+using Xappium.Logging;
 
 namespace Xappium.Tools
 {
@@ -13,11 +15,26 @@ namespace Xappium.Tools
         {
             get
             {
-                var result = ProcessHelper.Run("node", "-v", displayRealtimeOutput: true);
-                if (result.IsErred)
-                    return null;
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo("node", "-v")
+                    {
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true
+                    },
+                };
+                process.Start();
+                while(!process.StandardOutput.EndOfStream)
+                {
+                    var line = process.StandardOutput.ReadLine();
+                    if (line.StartsWith("v"))
+                    {
+                        Logger.WriteLine($"Node: {line} installed", LogLevel.Normal);
+                        return line;
+                    }
+                }
 
-                return result.Output.FirstOrDefault(x => x.StartsWith("v"));
+                return null;
             }
         }
 

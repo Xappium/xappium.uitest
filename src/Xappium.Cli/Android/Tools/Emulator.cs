@@ -2,25 +2,30 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using CliWrap;
+using CliWrap.Builders;
 using Xappium.Extensions;
+using Xappium.Logging;
 using static Xappium.Android.AndroidTool;
 
 namespace Xappium.Android
 {
     internal static class Emulator
     {
-        public static readonly string ToolPath = LocateUtility("emulator");
+        public static string ToolPath => LocateUtility("emulator");
 
-        public static void StartEmulator()
+        public static async Task StartEmulator(CancellationToken cancellationToken)
         {
-            var emulators = ListEmulators();
-            StartEmulator(emulators.FirstOrDefault());
+            var emulators = await ListEmulators(cancellationToken).ConfigureAwait(false);
+            await StartEmulator(emulators.FirstOrDefault(), cancellationToken).ConfigureAwait(false);
         }
 
-        public static void StartEmulator(string emulatorName)
+        public static async Task StartEmulator(string emulatorName, CancellationToken cancellationToken)
         {
-            ValidateStartEmulator(emulatorName);
+            await ValidateStartEmulator(emulatorName, cancellationToken).ConfigureAwait(false);
 
             // -no-window
 #pragma warning disable CS4014 // Launch Emulator without waiting
@@ -36,27 +41,30 @@ namespace Xappium.Android
 #pragma warning restore CS4014 // Launch Emulator without waiting
 
             // Wait for boot
-            WaitForBoot();
+            await WaitForBoot(cancellationToken).ConfigureAwait(false);
 
-            Console.WriteLine("Giving the device 20 seconds to finish getting ready.");
-            Thread.Sleep(TimeSpan.FromSeconds(20));
+            Logger.WriteLine("Giving the device 20 seconds to finish getting ready.", LogLevel.Minimal);
+            await Task.Delay(TimeSpan.FromSeconds(20)).ConfigureAwait(false);
         }
 
-        private static void WaitForBoot()
+        private static async Task WaitForBoot(CancellationToken cancellationToken)
         {
             var i = 0;
             while (true)
             {
-                var result = ProcessHelper.Run(Adb.ToolPath, "wait-for-device shell getprop sys.boot_completed");
+                var result = await Adb.ExecuteInternal(b =>
+                {
+                    b.Add("wait-for-device")
+                    .Add("shell")
+                    .Add("getprop")
+                    .Add("sys.boot_completed");
+                }, cancellationToken).ConfigureAwait(false);
 
-                if (result.IsErred)
-                    throw new Exception(result.Error);
-
-                if(result.Output.Any(x => x.Trim() == "1"))
+                if(result.Contains("1"))
                 {
                     // Wait a few seconds to ensure the OS has fully loaded
-                    Console.WriteLine("Emulator Started... waiting 10 seconds for full boot");
-                    Thread.Sleep(TimeSpan.FromSeconds(10));
+                    Logger.WriteLine("Emulator Started... waiting 10 seconds for full boot", LogLevel.Minimal);
+                    await Task.Delay(TimeSpan.FromSeconds(10));
                     return;
                 }
 
@@ -65,7 +73,7 @@ namespace Xappium.Android
                     throw new TimeoutException($"The Emulator does not appear to have started after 3 minutes");
                 }
 
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
 
@@ -89,9 +97,8 @@ namespace Xappium.Android
         //    }
         //}
 
-        private static void ValidateStartEmulator(string emulatorName)
+        private static async Task ValidateStartEmulator(string emulatorName, CancellationToken cancellationToken)
         {
-            ThrowIfNull(ToolPath, nameof(Emulator));
             ThrowIfNull(Adb.ToolPath, nameof(Adb));
 
             if (string.IsNullOrEmpty(emulatorName))
@@ -99,20 +106,20 @@ namespace Xappium.Android
                 throw new Exception($"No Installed Emulator could be found");
             }
 
-            var emulators = ListEmulators();
+            var emulators = await ListEmulators(cancellationToken);
             if (!emulators.Any(x => x == emulatorName))
             {
                 throw new Exception($"No such emulator exists with the name: '{emulatorName}'");
             }
         }
 
-        public static bool HasInstalledEmulator()
+        public static async Task<bool> HasInstalledEmulator(CancellationToken cancellationToken)
         {
             ThrowIfNull(ToolPath, nameof(Emulator));
 
             try
             {
-                var emulators = ListEmulators();
+                var emulators = await ListEmulators(cancellationToken).ConfigureAwait(false);
                 return emulators != null && emulators.Any();
             }
             catch
@@ -121,14 +128,36 @@ namespace Xappium.Android
             }
         }
 
-        public static IEnumerable<string> ListEmulators()
+        public static async Task<IEnumerable<string>> ListEmulators(CancellationToken cancellationToken)
         {
-            ThrowIfNull(ToolPath, nameof(Emulator));
-            var result = ProcessHelper.Run(ToolPath, "-list-avds");
-            if (result.IsErred)
-                throw new Exception("Error listing emulators");
+            var output = await ExecuteInternal(b => b.Add("-list-avds"), cancellationToken).ConfigureAwait(false);
+            return output.Split(Environment.NewLine).Where(x => !string.IsNullOrEmpty(x));
+        }
 
-            return result.Output.Where(x => !string.IsNullOrEmpty(x));
+        internal static async Task<string> ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
+        {
+            var toolPath = ToolPath;
+            ThrowIfNull(toolPath, nameof(Emulator));
+            var builder = new ArgumentsBuilder();
+            configure(builder);
+            var args = builder.Build();
+            Logger.WriteLine($"{toolPath} {args}", LogLevel.Normal);
+            var stdErrBuffer = new StringBuilder();
+            var stdOutBuffer = new StringBuilder();
+            var stdOut = PipeTarget.Merge(PipeTarget.ToStringBuilder(stdOutBuffer),
+                PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Verbose)));
+
+            await Cli.Wrap(toolPath)
+                .WithArguments(args)
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardOutputPipe(stdOut)
+                .ExecuteAsync(cancellationToken);
+
+            var stdErr = stdErrBuffer.ToString().Trim();
+            if (!string.IsNullOrEmpty(stdErr))
+                throw new Exception(stdErr);
+
+            return stdOutBuffer.ToString().Trim();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CliWrap;
 using CliWrap.Builders;
 using McMaster.Extensions.CommandLineUtils;
+using Xappium.Logging;
 
 namespace Xappium.Tools
 {
@@ -28,10 +29,8 @@ namespace Xappium.Tools
                      .Add($"--diag:{logFile}")
                      .Build();
 
-            Console.WriteLine($"Running dotnet test on '{projectPath}'");
-            Console.WriteLine($"{DotNetExe.FullPath} {args}");
-
-            return Execute(args, cancellationToken);
+            Logger.WriteLine($"Running dotnet test on '{projectPath}'", LogLevel.Minimal);
+            return Execute(args, LogLevel.Normal, cancellationToken);
         }
 
         public static Task Build(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
@@ -40,17 +39,15 @@ namespace Xappium.Tools
                 .Add("build");
             configure(builder);
 
-            return Execute(builder.Build(), cancellationToken);
+            return Execute(builder.Build(), LogLevel.Detailed, cancellationToken);
         }
 
-        private static async Task Execute(string args, CancellationToken cancellationToken)
+        private static async Task Execute(string args, LogLevel logLevel, CancellationToken cancellationToken)
         {
-            System.Console.WriteLine($"dotnet {args}");
+            Logger.WriteLine($"{DotNetExe.FullPath} {args}", LogLevel.Normal);
             var stdErrBuffer = new StringBuilder();
-            var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
-            var stdErr = PipeTarget.Merge(
-                PipeTarget.ToStringBuilder(stdErrBuffer),
-                PipeTarget.ToDelegate(l => Console.WriteLine(l)));
+            var stdOut = PipeTarget.ToDelegate(l => Logger.WriteLine(l, logLevel));
+            var stdErr = PipeTarget.ToStringBuilder(stdErrBuffer);
 
             var result = await Cli.Wrap(DotNetExe.FullPath)
                 .WithArguments(args)
