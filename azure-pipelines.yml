@@ -4,6 +4,10 @@ trigger:
     include:
     - master
 
+variables:
+  - name: DotNet.Cli.Telemtry.OptOut
+    value: true
+
 stages:
   - stage: build
     displayName: Build
