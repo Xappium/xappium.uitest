@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -13,8 +14,7 @@ namespace Xappium.Android
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             if(EnvironmentHelper.IsRunningOnMac)
             {
-                var result = ProcessHelper.Run("echo", "$(/usr/libexec/java_home)");
-                s_java_home = result.Output.FirstOrDefault();
+                s_java_home = GetMacOSJavaHome();
             }
             else
             {
@@ -61,6 +61,25 @@ namespace Xappium.Android
         private static readonly string[] s_androidSdkPaths;
 
         private static readonly string[] s_searchPaths;
+
+        private static string GetMacOSJavaHome()
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo("echo", "$(/usr/libexec/java_home)")
+                {
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true
+                }
+            };
+            process.Start();
+            while (!process.StandardOutput.EndOfStream)
+            {
+                return process.StandardOutput.ReadLine();
+            }
+
+            return null;
+        }
 
         public static void ValidateEnvironmentSettings()
         {

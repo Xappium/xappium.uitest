@@ -1,5 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using CliWrap;
+using CliWrap.Builders;
+using Xappium.Logging;
 using static Xappium.Android.AndroidTool;
 
 namespace Xappium.Android
@@ -8,25 +14,37 @@ namespace Xappium.Android
     {
         public static readonly string ToolPath = LocateUtility("sdkmanager");
 
-        public static void InstallWebDriver()
+        public static Task InstallWebDriver(CancellationToken cancellationToken)
         {
-            ThrowIfNull(ToolPath, nameof(SdkManager));
-
-            var result = ProcessHelper.Run(ToolPath, @"--install ""extras;google;webdriver""", displayRealtimeOutput: true, new[] { "y" });
-
-            if (result.IsErred)
-                throw new Exception(result.Error);
+            return ExecuteInternal(o => o.Add(@"--install ""extras;google;webdriver"""), cancellationToken);
         }
 
-        public static void EnsureSdkIsInstalled(int sdkVersion = 29)
+        public static Task EnsureSdkIsInstalled(int sdkVersion, CancellationToken cancellationToken)
+        {
+            var installArgs = $"system-images;android-{sdkVersion};google_apis_playstore;x86";
+            return ExecuteInternal(o => o.Add($"--install \"{installArgs}\""), cancellationToken);
+        }
+
+        public static Task InstallLatestCommandLineTools(CancellationToken cancellationToken)
+        {
+            return ExecuteInternal(o => o.Add(@"--install ""cmdline-tools;latest"""), cancellationToken);
+        }
+
+        private static async Task ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
         {
             ThrowIfNull(ToolPath, nameof(SdkManager));
 
-            var installArgs = $"system-images;android-{sdkVersion};google_apis_playstore;x86";
-            var result = ProcessHelper.Run(ToolPath, $"--install \"{installArgs}\"", displayRealtimeOutput: true, new[] { "y" });
-            // echo y
-            if (result.IsErred)
-                throw new Exception(result.Error);
+            var stdErrBuffer = new StringBuilder();
+            await Cli.Wrap(ToolPath)
+               .WithArguments(configure)
+               .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+               .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Detailed)))
+               .WithStandardInputPipe(PipeSource.FromString("y"))
+               .ExecuteAsync(cancellationToken);
+
+            var stdErr = stdErrBuffer.ToString().Trim();
+            if (!string.IsNullOrEmpty(stdErr))
+                throw new Exception(stdErr);
         }
     }
 }

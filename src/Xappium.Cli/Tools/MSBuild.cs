@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CliWrap;
+using Xappium.Logging;
 
 namespace Xappium.Tools
 {
@@ -81,7 +82,7 @@ namespace Xappium.Tools
                     var logoutput = Path.Combine(baseWorkingDirectory, "logs", $"{Path.GetFileNameWithoutExtension(projectPath)}.binlog");
                     b.Add($"/bl:{logoutput}");
                 })
-                .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Console.WriteLine(l)))
+                .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Normal)))
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                 .WithValidation(CommandResultValidation.None)
                 .ExecuteAsync(cancellationToken)

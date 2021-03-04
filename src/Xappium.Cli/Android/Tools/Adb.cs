@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using CliWrap;
+using CliWrap.Builders;
+using Xappium.Logging;
 using static Xappium.Android.AndroidTool;
 
 namespace Xappium.Android
@@ -11,14 +16,13 @@ namespace Xappium.Android
     {
         private const string androidDeviceRegex = @"\s+(device)$";
 
-        public static readonly string ToolPath = LocateUtility("adb");
+        public static string ToolPath => LocateUtility("adb");
 
-        public static bool DeviceIsConnected()
+        public static async Task<bool> DeviceIsConnected(CancellationToken cancellationToken)
         {
-            ThrowIfNull(ToolPath, nameof(Adb));
             try
             {
-                var devices = ListDevices();
+                var devices = await ListDevices(cancellationToken).ConfigureAwait(false);
                 var device = devices.FirstOrDefault();
                 return device != null;
             }
@@ -28,31 +32,52 @@ namespace Xappium.Android
             }
         }
 
-        public static IEnumerable<AndroidDevice> ListDevices()
+        public static async Task<IEnumerable<AndroidDevice>> ListDevices(CancellationToken cancellationToken)
         {
-            ThrowIfNull(ToolPath, nameof(Adb));
-            var result = ProcessHelper.Run(ToolPath, "devices");
-            if (result.IsErred)
-                return Array.Empty<AndroidDevice>();
+            var output = await ExecuteInternal(b => b.Add("devices"), cancellationToken).ConfigureAwait(false);
 
-            var ids = result.Output.Where(x => Regex.IsMatch(x, androidDeviceRegex))
+            var ids = output.Split(Environment.NewLine).Where(x => Regex.IsMatch(x, androidDeviceRegex))
                 .Select(x => Regex.Replace(x, androidDeviceRegex, string.Empty));
 
             // List of devices attached
             var devices = new List<AndroidDevice>();
             foreach (var deviceId in ids)
             {
-                result = ProcessHelper.Run(ToolPath, $"-s {deviceId} shell getprop");
-                if (result.IsErred)
-                    continue;
+                output = await ExecuteInternal(b => b.Add($"-s {deviceId} shell getprop"), cancellationToken).ConfigureAwait(false);
 
-                devices.Add(new AndroidDevice(deviceId, result.Output.ToArray()));
+                devices.Add(new AndroidDevice(deviceId, output.Split(Environment.NewLine)));
             }
 
             if (!devices.Any())
-                Console.WriteLine("-- NO DEVICES FOUND --");
+                Logger.WriteLine("-- NO DEVICES FOUND --", LogLevel.Minimal);
 
             return devices;
+        }
+
+        internal static async Task<string> ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
+        {
+            var toolPath = ToolPath;
+            ThrowIfNull(toolPath, nameof(Adb));
+            var builder = new ArgumentsBuilder();
+            configure(builder);
+            var args = builder.Build();
+            Logger.WriteLine($"{toolPath} {args}", LogLevel.Normal);
+            var stdErrBuffer = new StringBuilder();
+            var stdOutBuffer = new StringBuilder();
+            var stdOut = PipeTarget.Merge(PipeTarget.ToStringBuilder(stdOutBuffer),
+                PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Verbose)));
+
+            await Cli.Wrap(toolPath)
+                .WithArguments(args)
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardOutputPipe(stdOut)
+                .ExecuteAsync(cancellationToken);
+
+            var stdErr = stdErrBuffer.ToString().Trim();
+            if (!string.IsNullOrEmpty(stdErr))
+                throw new Exception(stdErr);
+
+            return stdOutBuffer.ToString().Trim();
         }
     }
 }

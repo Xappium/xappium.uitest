@@ -10,6 +10,7 @@ using McMaster.Extensions.CommandLineUtils;
 using Xappium.Android;
 using Xappium.Apple;
 using Xappium.BuildSystem;
+using Xappium.Logging;
 using Xappium.Tools;
 
 namespace Xappium
@@ -62,22 +63,30 @@ namespace Xappium
             ShortName = "show")]
         public bool DisplayGeneratedConfig { get; }
 
+        [Option(Description = "Sets the level of logging output to the console.",
+            LongName = "logger",
+            ShortName = "l")]
+        public LogLevel LogLevel { get; } = LogLevel.Normal;
+
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members",
             Justification = "Called by McMaster")]
         private async Task<int> OnExecuteAsync(CancellationToken cancellationToken)
         {
             IDisposable appium = null;
+            Logger.Level = LogLevel;
+
+            if (Directory.Exists(BaseWorkingDirectory))
+                Directory.Delete(BaseWorkingDirectory, true);
+
+            Directory.CreateDirectory(BaseWorkingDirectory);
+            Logger.SetWorkingDirectory(BaseWorkingDirectory);
+
             try
             {
                 if (!Node.IsInstalled)
                     throw new Exception("Your environment does not appear to have Node installed. This is required to run Appium");
 
-                if (Directory.Exists(BaseWorkingDirectory))
-                    Directory.Delete(BaseWorkingDirectory, true);
-
-                Directory.CreateDirectory(BaseWorkingDirectory);
-
-                Console.WriteLine($"Build and Test artifacts will be stored at {BaseWorkingDirectory}");
+                Logger.WriteLine($"Build and Test artifacts will be stored at {BaseWorkingDirectory}", LogLevel.Detailed);
 
                 ValidatePaths();
 
@@ -106,7 +115,7 @@ namespace Xappium
                 if (appProject is DotNetMauiProjectFile && appProject.Platform == "Android")
                     sdkVersion = 30;
 
-                GenerateTestConfig(headBin, uiTestBin, appProject.Platform);
+                await GenerateTestConfig(headBin, uiTestBin, appProject.Platform, cancellationToken).ConfigureAwait(false);
 
                 if(!await Appium.Install(cancellationToken))
                 {
@@ -120,14 +129,7 @@ namespace Xappium
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex);
-                Console.ResetColor();
-
-                var logsDir = new DirectoryInfo(Path.Combine(BaseWorkingDirectory, "logs"));
-                if(!logsDir.Exists)
-                    logsDir.Create();
-                File.WriteAllText(Path.Combine(logsDir.FullName, "crash.log"), ex.ToString());
+                Logger.WriteError(ex);
                 return 1;
             }
             finally
@@ -154,7 +156,7 @@ namespace Xappium
                 throw new FileNotFoundException($"The specified Platform head project path does not exist: '{DeviceProjectPath}'");
         }
 
-        private void GenerateTestConfig(string headBin, string uiTestBin, string platform)
+        private async Task GenerateTestConfig(string headBin, string uiTestBin, string platform, CancellationToken cancellationToken)
         {
             var binDir = new DirectoryInfo(headBin);
             var options = new JsonSerializerOptions
@@ -204,23 +206,26 @@ namespace Xappium
             {
                 case "Android":
                     // Ensure WebDrivers are installed
-                    SdkManager.InstallWebDriver();
+                    await SdkManager.InstallWebDriver(cancellationToken).ConfigureAwait(false);
+
+                    // Ensure latest CmdLine tools are installed
+                    await SdkManager.InstallLatestCommandLineTools(cancellationToken).ConfigureAwait(false);
 
                     // Check for connected device
-                    if (!Adb.DeviceIsConnected())
+                    if (!await Adb.DeviceIsConnected(cancellationToken))
                     {
                         // Ensure SDK Installed
-                        SdkManager.EnsureSdkIsInstalled(sdkVersion);
+                        await SdkManager.EnsureSdkIsInstalled(sdkVersion, cancellationToken).ConfigureAwait(false);
 
                         // Ensure Emulator Exists
-                        if (!Emulator.ListEmulators().Any(x => x == AvdManager.DefaultUITestEmulatorName))
-                            AvdManager.InstallEmulator(sdkVersion);
+                        if (!(await Emulator.ListEmulators(cancellationToken)).Any(x => x == AvdManager.DefaultUITestEmulatorName))
+                            await AvdManager.InstallEmulator(sdkVersion, cancellationToken);
 
                         // Start Emulator
-                        Emulator.StartEmulator(AvdManager.DefaultUITestEmulatorName);
+                        await Emulator.StartEmulator(AvdManager.DefaultUITestEmulatorName, cancellationToken).ConfigureAwait(false);
                     }
 
-                    var emulator = Adb.ListDevices().First();
+                    var emulator = (await Adb.ListDevices(cancellationToken).ConfigureAwait(false)).First();
                     config.DeviceName = emulator.Name;
                     config.UDID = emulator.Id;
                     config.OSVersion = $"{emulator.SdkVersion}";
@@ -241,7 +246,7 @@ namespace Xappium
             File.WriteAllText(testConfig, jsonOutput);
 
             if(DisplayGeneratedConfig)
-                Console.WriteLine(jsonOutput);
+                Logger.WriteLine(jsonOutput, LogLevel.Normal);
         }
     }
 }
