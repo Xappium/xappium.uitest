@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -139,6 +139,8 @@ namespace Xappium
                 var binDir = Path.Combine(BaseWorkingDirectory, "bin");
                 if(Directory.Exists(binDir))
                     Directory.Delete(binDir, true);
+
+                ReadTestResults();
             }
 
             return 0;
@@ -247,6 +249,27 @@ namespace Xappium
 
             if(DisplayGeneratedConfig)
                 Logger.WriteLine(jsonOutput, LogLevel.Normal);
+        }
+
+        private void ReadTestResults()
+        {
+            try
+            {
+                var testResultsDirectoryInfo = new DirectoryInfo(Path.Combine(BaseWorkingDirectory, "results"));
+                if (!testResultsDirectoryInfo.Exists)
+                    return;
+
+                var trxFileInfo = testResultsDirectoryInfo.EnumerateFiles("*.trx").FirstOrDefault();
+                if (trxFileInfo is null)
+                    return;
+
+                var trx = TrxReader.Load(trxFileInfo);
+                trx.LogReport();
+            }
+            catch
+            {
+                // suppress errors
+            }
         }
     }
 }
