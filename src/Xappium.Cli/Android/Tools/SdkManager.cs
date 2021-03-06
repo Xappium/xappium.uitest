@@ -37,6 +37,7 @@ namespace Xappium.Android
             var stdErrBuffer = new StringBuilder();
             await Cli.Wrap(ToolPath)
                .WithArguments(configure)
+               .WithValidation(CommandResultValidation.None)
                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                .WithStandardOutputPipe(PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Detailed)))
                .WithStandardInputPipe(PipeSource.FromString("y"))

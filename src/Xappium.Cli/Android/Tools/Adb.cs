@@ -69,6 +69,7 @@ namespace Xappium.Android
 
             await Cli.Wrap(toolPath)
                 .WithArguments(args)
+                .WithValidation(CommandResultValidation.None)
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                 .WithStandardOutputPipe(stdOut)
                 .ExecuteAsync(cancellationToken);

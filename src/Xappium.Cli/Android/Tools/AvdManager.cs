@@ -77,6 +77,7 @@ namespace Xappium.Android
 
             var cmd = Cli.Wrap(toolPath)
                 .WithArguments(args)
+                .WithValidation(CommandResultValidation.None)
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                 .WithStandardOutputPipe(stdOut);
 

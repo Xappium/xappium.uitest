@@ -47,6 +47,7 @@ namespace Xappium.Tools
             var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
             await Cli.Wrap("npm")
                 .WithArguments($"install -g {packageName}")
+                .WithValidation(CommandResultValidation.None)
                 .WithStandardOutputPipe(stdOut)
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                 .ExecuteAsync(cancellationToken);
