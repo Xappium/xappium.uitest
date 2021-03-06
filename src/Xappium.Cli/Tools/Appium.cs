@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,13 +12,47 @@ namespace Xappium.Tools
     {
         private const string defaultLog = "appium.log";
 
+        public static string Version
+        {
+            get
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo("appium", "-v")
+                    {
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true
+                    },
+                };
+                process.Start();
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    var line = process.StandardOutput.ReadLine();
+                    if (line.StartsWith("v"))
+                    {
+                        Logger.WriteLine($"Appium: {line} installed", LogLevel.Normal);
+                        return line;
+                    }
+                }
+
+                Logger.WriteWarning("Appium is not currently installed");
+                return null;
+            }
+        }
+
         public static async Task<bool> Install(CancellationToken cancellationToken)
         {
+            if (!string.IsNullOrEmpty(Version))
+                return true;
+
             return Node.IsInstalled && await Node.InstallPackage("appium", cancellationToken).ConfigureAwait(false);
         }
 
         public static Task<IDisposable> Run(string baseWorkingDirectory)
         {
+            if (string.IsNullOrEmpty(Version))
+                throw new Exception("Appium is not installed.");
+
             var completed = false;
             var tcs = new TaskCompletionSource<IDisposable>();
             var cancellationSource = new CancellationTokenSource();
