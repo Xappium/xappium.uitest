@@ -1,12 +1,18 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Xappium.Android;
+using Xappium.Logging;
 using Xunit;
 
 namespace Xappium.Cli.Tests
 {
     public class AvdManagerTests
     {
+        public AvdManagerTests()
+        {
+            XUnitLogger.Init();
+        }
+
         [Fact]
         public async Task InstallsEmulator()
         {
