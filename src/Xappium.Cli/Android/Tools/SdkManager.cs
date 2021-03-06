@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,7 +46,12 @@ namespace Xappium.Android
 
             var stdErr = stdErrBuffer.ToString().Trim();
             if (!string.IsNullOrEmpty(stdErr))
-                throw new Exception(stdErr);
+            {
+                if (stdErr.Split(Environment.NewLine).All(x => x.StartsWith("Warning:")))
+                    Logger.WriteWarning(stdErr);
+                else
+                    throw new Exception(stdErr);
+            }
         }
     }
 }
