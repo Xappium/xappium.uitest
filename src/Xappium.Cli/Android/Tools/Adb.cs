@@ -43,7 +43,10 @@ namespace Xappium.Android
             var devices = new List<AndroidDevice>();
             foreach (var deviceId in ids)
             {
-                output = await ExecuteInternal(b => b.Add($"-s {deviceId} shell getprop"), cancellationToken).ConfigureAwait(false);
+                output = await ExecuteInternal(b => b.Add("-s")
+                                                     .Add(deviceId)
+                                                     .Add("shell")
+                                                     .Add("group"), cancellationToken);
 
                 devices.Add(new AndroidDevice(deviceId, output.Split(Environment.NewLine)));
             }

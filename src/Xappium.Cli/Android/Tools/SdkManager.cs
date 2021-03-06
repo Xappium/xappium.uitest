@@ -16,18 +16,18 @@ namespace Xappium.Android
 
         public static Task InstallWebDriver(CancellationToken cancellationToken)
         {
-            return ExecuteInternal(o => o.Add(@"--install ""extras;google;webdriver"""), cancellationToken);
+            return ExecuteInternal(o => o.Add("--install").Add("extras;google;webdriver"), cancellationToken);
         }
 
         public static Task EnsureSdkIsInstalled(int sdkVersion, CancellationToken cancellationToken)
         {
             var installArgs = $"system-images;android-{sdkVersion};google_apis_playstore;x86";
-            return ExecuteInternal(o => o.Add($"--install \"{installArgs}\""), cancellationToken);
+            return ExecuteInternal(o => o.Add("--install").Add(installArgs), cancellationToken);
         }
 
         public static Task InstallLatestCommandLineTools(CancellationToken cancellationToken)
         {
-            return ExecuteInternal(o => o.Add(@"--install ""cmdline-tools;latest"""), cancellationToken);
+            return ExecuteInternal(o => o.Add("--install").Add("cmdline-tools;latest"), cancellationToken);
         }
 
         private static async Task ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)

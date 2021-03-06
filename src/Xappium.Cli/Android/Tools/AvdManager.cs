@@ -33,9 +33,12 @@ namespace Xappium.Android
             {
                 b.Add("create")
                 .Add("avd")
-                .Add($"-n {DefaultUITestEmulatorName}")
-                .Add($@"-k ""system-images;android-{sdkVersion};google_apis_playstore;x86""")
-                .Add($"--device {device}")
+                .Add("--name")
+                .Add(DefaultUITestEmulatorName)
+                .Add("--package")
+                .Add($"system-images;android-{sdkVersion};google_apis_playstore;x86")
+                .Add("--device")
+                .Add(device)
                 .Add("--force");
             }, cancellationToken, PipeSource.FromString("no")).ConfigureAwait(false);
         }
@@ -45,7 +48,9 @@ namespace Xappium.Android
             return ExecuteInternal(b =>
             {
                 b.Add("delete")
-                .Add($"-n {DefaultUITestEmulatorName}");
+                 .Add("avd")
+                 .Add("--name")
+                 .Add(DefaultUITestEmulatorName);
             }, cancellationToken);
         }
 
@@ -55,7 +60,7 @@ namespace Xappium.Android
             {
                 b.Add("list")
                 .Add("device")
-                .Add("-c");
+                .Add("--compact");
             }, cancellationToken).ConfigureAwait(false);
 
             // Skip the Parsing notification

@@ -10,7 +10,7 @@ namespace Xappium.Cli.Tests
         {
             var testDir = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "test"));
             if (testDir.Exists)
-                testDir.Delete();
+                testDir.Delete(true);
 
             testDir.Create();
 
