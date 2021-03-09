@@ -13,6 +13,8 @@ namespace Xappium.Logging
 
         public static string DefaultLogPath => Path.Combine(logDirectory, defaultLog);
 
+        public static bool HasErrors { get; private set; }
+
         public static void SetWorkingDirectory(string baseWorkingDirectory)
         {
             logDirectory = Path.Combine(baseWorkingDirectory, "logs");
@@ -41,6 +43,7 @@ namespace Xappium.Logging
 
         public static void WriteError(string message)
         {
+            HasErrors = true;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
             Console.ResetColor();

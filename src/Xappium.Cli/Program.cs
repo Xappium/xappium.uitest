@@ -141,7 +141,7 @@ namespace Xappium
                    Directory.Delete(binDir, true);
             }
 
-            return 0;
+            return Logger.HasErrors ? 1 : 0;
         }
 
         private void ValidatePaths()
