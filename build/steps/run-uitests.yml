@@ -13,7 +13,7 @@ steps:
   inputs:
     useGlobalJson: true
 
-- bash: node install -g appium
+- bash: npm install -g appium
   displayName: Install Appium
 
 - bash: |
