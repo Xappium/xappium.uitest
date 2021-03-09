@@ -28,7 +28,7 @@ namespace Xappium.Tools
                 while (!process.StandardOutput.EndOfStream)
                 {
                     var line = process.StandardOutput.ReadLine();
-                    if (line.StartsWith("v"))
+                    if (!string.IsNullOrEmpty(line))
                     {
                         Logger.WriteLine($"Appium: {line} installed", LogLevel.Normal);
                         return line;
@@ -42,9 +42,6 @@ namespace Xappium.Tools
 
         public static async Task<bool> Install(CancellationToken cancellationToken)
         {
-            if (!string.IsNullOrEmpty(Version))
-                return true;
-
             return Node.IsInstalled && await Node.InstallPackage("appium", cancellationToken).ConfigureAwait(false);
         }
 
