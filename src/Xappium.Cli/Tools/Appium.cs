@@ -42,6 +42,9 @@ namespace Xappium.Tools
 
         public static async Task<bool> Install(CancellationToken cancellationToken)
         {
+            if (!string.IsNullOrEmpty(Version))
+                return true;
+
             return Node.IsInstalled && await Node.InstallPackage("appium", cancellationToken).ConfigureAwait(false);
         }
 

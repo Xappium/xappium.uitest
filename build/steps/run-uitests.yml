@@ -13,6 +13,9 @@ steps:
   inputs:
     useGlobalJson: true
 
+- bash: node install -g appium
+  displayName: Install Appium
+
 - bash: |
     export DOTNET_CLI_TELEMETRY_OPTOUT=true
     ARTIFACT_DIR=$PIPELINE_WORKSPACE/UITests
