@@ -26,6 +26,9 @@ namespace Xappium.UITest.Platforms
             AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "XCUITest");
             AddAdditionalCapability(options, "autoAcceptAlerts", true);
             AddAdditionalCapability(options, "isHeadless", true);
+            AddAdditionalCapability(options, IOSMobileCapabilityType.LaunchTimeout, 60000);
+            AddAdditionalCapability(options, "appium:screenshotQuality", 2);
+            AddAdditionalCapability(options, "appium:showIOSLog", true);
 
             return new IOSDriver<IOSElement>(config.AppiumServer, options, TimeSpan.FromSeconds(90));
         }
