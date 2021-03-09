@@ -129,7 +129,7 @@ namespace Xappium
             }
             catch (Exception ex)
             {
-                Logger.WriteError(ex);
+                Logger.WriteError(ex.Message);
                 return 1;
             }
             finally
@@ -138,9 +138,7 @@ namespace Xappium
 
                 var binDir = Path.Combine(BaseWorkingDirectory, "bin");
                 if(Directory.Exists(binDir))
-                    Directory.Delete(binDir, true);
-
-                ReadTestResults();
+                   Directory.Delete(binDir, true);
             }
 
             return 0;
@@ -249,27 +247,6 @@ namespace Xappium
 
             if(DisplayGeneratedConfig)
                 Logger.WriteLine(jsonOutput, LogLevel.Normal);
-        }
-
-        private void ReadTestResults()
-        {
-            try
-            {
-                var testResultsDirectoryInfo = new DirectoryInfo(Path.Combine(BaseWorkingDirectory, "results"));
-                if (!testResultsDirectoryInfo.Exists)
-                    return;
-
-                var trxFileInfo = testResultsDirectoryInfo.EnumerateFiles("*.trx").FirstOrDefault();
-                if (trxFileInfo is null)
-                    return;
-
-                var trx = TrxReader.Load(trxFileInfo);
-                trx.LogReport();
-            }
-            catch
-            {
-                // suppress errors
-            }
         }
     }
 }

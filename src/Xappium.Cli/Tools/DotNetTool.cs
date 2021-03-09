@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Xappium.Tools
 {
     internal static class DotNetTool
     {
-        public static Task Test(string projectPath, string outputPath, string configuration, string resultsDirectory, CancellationToken cancellationToken)
+        public static async Task Test(string projectPath, string outputPath, string configuration, string resultsDirectory, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(configuration))
                 configuration = "Release";
@@ -30,7 +31,42 @@ namespace Xappium.Tools
                      .Build();
 
             Logger.WriteLine($"Running dotnet test on '{projectPath}'", LogLevel.Minimal);
-            return Execute(args, LogLevel.Normal, cancellationToken);
+            try
+            {
+                await Execute(args, LogLevel.Normal, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteError(ex.Message);
+            }
+            finally
+            {
+                ReadTestResults(resultsDirectory);
+            }
+        }
+
+        private static void ReadTestResults(string resultsDirectory)
+        {
+            try
+            {
+                var resultsDirectoryInfo = new DirectoryInfo(resultsDirectory);
+                if (!resultsDirectoryInfo.Exists)
+                    return;
+
+                var trxFileInfo = resultsDirectoryInfo.EnumerateFiles("*.trx").FirstOrDefault();
+                if (trxFileInfo is null)
+                {
+                    return;
+                }
+
+                var trx = TrxReader.Load(trxFileInfo);
+                trx.LogReport();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                // suppress errors
+            }
         }
 
         public static Task Build(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)

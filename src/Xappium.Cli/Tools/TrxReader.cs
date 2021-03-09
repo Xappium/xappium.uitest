@@ -26,22 +26,27 @@ namespace Xappium.Tools
             var counters = testRun.ResultSummary.Counters;
             Logger.WriteLine($"Total: {counters.Total}", LogLevel.Minimal);
 
-            if (counters.Completed > 0)
-                Logger.WriteLine($"Completed: {counters.Completed}", LogLevel.Minimal);
-
-            if (counters.Passed > 0)
+            if (counters.Total > 0)
+            {
                 Logger.WriteLine($"Passed: {counters.Passed}", LogLevel.Minimal);
 
-            if (counters.Error > 0)
-                Logger.WriteError($"Errors: {counters.Error}");
+                if (counters.Timeout > 0)
+                    Logger.WriteWarning($"Timed Out: {counters.Timeout}");
 
-            if (counters.NotExecuted > 0)
-                Logger.WriteLine($"Not Executed: {counters.NotExecuted}", LogLevel.Minimal);
+                if (counters.NotExecuted > 0)
+                    Logger.WriteWarning($"Not Executed: {counters.NotExecuted}");
+
+                if (counters.Error > 0)
+                    Logger.WriteError($"Errors: {counters.Error}");
+
+                if (counters.Failed > 0)
+                    Logger.WriteError($"Failed: {counters.Failed}");
+            }
         }
     }
 
     [XmlRoot(ElementName="Times", Namespace = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010")]
-    internal class Times
+    public class Times
     {
         [XmlAttribute(AttributeName="creation")]
         public DateTime Creation { get; set; }
@@ -57,14 +62,14 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="Deployment")]
-    internal class Deployment
+    public class Deployment
     {
         [XmlAttribute(AttributeName="runDeploymentRoot")]
         public string RunDeploymentRoot { get; set; }
     }
 
     [XmlRoot(ElementName="TestSettings")]
-    internal class TestSettings
+    public class TestSettings
     {
         [XmlElement(ElementName="Deployment")]
         public Deployment Deployment { get; set; }
@@ -77,7 +82,7 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="UnitTestResult")]
-    internal class UnitTestResult
+    public class UnitTestResult
     {
         [XmlAttribute(AttributeName="executionId")]
         public string ExecutionId { get; set; }
@@ -114,21 +119,21 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="Results")]
-    internal class Results
+    public class Results
     {
         [XmlElement(ElementName="UnitTestResult")]
         public List<UnitTestResult> UnitTestResult { get; set; }
     }
 
     [XmlRoot(ElementName="Execution")]
-    internal class Execution
+    public class Execution
     {
         [XmlAttribute(AttributeName="id")]
         public string Id { get; set; }
     }
 
     [XmlRoot(ElementName="TestMethod")]
-    internal class TestMethod
+    public class TestMethod
     {
         [XmlAttribute(AttributeName="codeBase")]
         public string CodeBase { get; set; }
@@ -144,7 +149,7 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="UnitTest")]
-    internal class UnitTest
+    public class UnitTest
     {
         [XmlElement(ElementName="Execution")]
         public Execution Execution { get; set; }
@@ -163,14 +168,14 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="TestDefinitions")]
-    internal class TestDefinitions
+    public class TestDefinitions
     {
         [XmlElement(ElementName="UnitTest")]
         public List<UnitTest> UnitTest { get; set; }
     }
 
     [XmlRoot(ElementName="TestEntry")]
-    internal class TestEntry
+    public class TestEntry
     {
         [XmlAttribute(AttributeName="testId")]
         public string TestId { get; set; }
@@ -183,14 +188,14 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="TestEntries")]
-    internal class TestEntries
+    public class TestEntries
     {
         [XmlElement(ElementName="TestEntry")]
         public List<TestEntry> TestEntry { get; set; }
     }
 
     [XmlRoot(ElementName="TestList")]
-    internal class TestList
+    public class TestList
     {
         [XmlAttribute(AttributeName="name")]
         public string Name { get; set; }
@@ -200,14 +205,14 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="TestLists")]
-    internal class TestLists
+    public class TestLists
     {
         [XmlElement(ElementName="TestList")]
         public List<TestList> TestList { get; set; }
     }
 
     [XmlRoot(ElementName="Counters")]
-    internal class Counters
+    public class Counters
     {
         [XmlAttribute(AttributeName="total")]
         public int Total { get; set; }
@@ -259,14 +264,14 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="Output")]
-    internal class Output
+    public class Output
     {
         [XmlElement(ElementName="StdOut")]
         public string StdOut { get; set; }
     }
 
     [XmlRoot(ElementName="ResultSummary")]
-    internal class ResultSummary
+    public class ResultSummary
     {
         [XmlElement(ElementName="Counters")]
         public Counters Counters { get; set; }
@@ -282,7 +287,7 @@ namespace Xappium.Tools
     }
 
     [XmlRoot(ElementName="TestRun")]
-    internal class TestRun
+    public class TestRun
     {
         [XmlElement(ElementName="Times")]
         public Times Times { get; set; }
