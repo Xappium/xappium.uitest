@@ -17,15 +17,24 @@ namespace Xappium.Android
     {
         public static string ToolPath => LocateUtility("avdmanager");
 
-        public const string DefaultUITestEmulatorName = "uitest_android_emulator";
+        public const string DefaultUITestEmulatorName = "xappium_emulator_sdk";
 
-        public static async Task InstallEmulator(int sdkVersion, CancellationToken cancellationToken)
+        public static async Task InstallEmulator(string emulatorName, int sdkVersion, CancellationToken cancellationToken)
         {
             var devices = await GetDevices(cancellationToken);
             var device = devices
                 .Where(x => Regex.IsMatch(x, @"^pixel_\d$"))
                 .OrderByDescending(x => x)
                 .FirstOrDefault();
+
+            if (string.IsNullOrEmpty(device))
+            {
+                Logger.WriteError("Current Devices");
+                foreach (var d in devices)
+                    Logger.WriteError($"  - {d}");
+
+                throw new Exception("No pixel device found.");
+            }
 
             Logger.WriteLine($"Installing Emulator for SDK Version: {sdkVersion} with Device {device}", LogLevel.Normal);
 
@@ -34,7 +43,7 @@ namespace Xappium.Android
                 b.Add("create")
                 .Add("avd")
                 .Add("--name")
-                .Add(DefaultUITestEmulatorName)
+                .Add(emulatorName)
                 .Add("--package")
                 .Add($"system-images;android-{sdkVersion};google_apis_playstore;x86")
                 .Add("--device")
@@ -43,14 +52,14 @@ namespace Xappium.Android
             }, cancellationToken, PipeSource.FromString("no")).ConfigureAwait(false);
         }
 
-        public static Task DeleteEmulator(CancellationToken cancellationToken)
+        public static Task DeleteEmulator(string emulatorName, CancellationToken cancellationToken)
         {
             return ExecuteInternal(b =>
             {
                 b.Add("delete")
                  .Add("avd")
                  .Add("--name")
-                 .Add(DefaultUITestEmulatorName);
+                 .Add(emulatorName);
             }, cancellationToken);
         }
 
@@ -63,8 +72,9 @@ namespace Xappium.Android
                 .Add("--compact");
             }, cancellationToken).ConfigureAwait(false);
 
+            System.Diagnostics.Debugger.Launch();
             // Skip the Parsing notification
-            return output.Split(Environment.NewLine).Skip(1);
+            return output.Split('\n').Select(x => x.Trim()).Skip(1);
         }
 
         private static async Task<string> ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken, PipeSource stdInput = null)

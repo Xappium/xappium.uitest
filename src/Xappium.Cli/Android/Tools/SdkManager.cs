@@ -47,7 +47,7 @@ namespace Xappium.Android
             var stdErr = stdErrBuffer.ToString().Trim();
             if (!string.IsNullOrEmpty(stdErr))
             {
-                if (stdErr.Split(Environment.NewLine).All(x => x.StartsWith("Warning:")))
+                if (stdErr.Split('\n').Select(x => x.Trim()).All(x => x.StartsWith("Warning:")))
                     Logger.WriteWarning(stdErr);
                 else
                     throw new Exception(stdErr);

@@ -23,8 +23,7 @@ namespace Xappium.Android
             try
             {
                 var devices = await ListDevices(cancellationToken).ConfigureAwait(false);
-                var device = devices.FirstOrDefault();
-                return device != null;
+                return devices.Any();
             }
             catch
             {
@@ -36,7 +35,8 @@ namespace Xappium.Android
         {
             var output = await ExecuteInternal(b => b.Add("devices"), cancellationToken).ConfigureAwait(false);
 
-            var ids = output.Split(Environment.NewLine).Where(x => Regex.IsMatch(x, androidDeviceRegex))
+            System.Diagnostics.Debugger.Launch();
+            var ids = output.Split('\n').Select(x => x.Trim()).Where(x => Regex.IsMatch(x, androidDeviceRegex))
                 .Select(x => Regex.Replace(x, androidDeviceRegex, string.Empty));
 
             // List of devices attached
@@ -48,7 +48,7 @@ namespace Xappium.Android
                                                      .Add("shell")
                                                      .Add("group"), cancellationToken);
 
-                devices.Add(new AndroidDevice(deviceId, output.Split(Environment.NewLine)));
+                devices.Add(new AndroidDevice(deviceId, output.Split('\n').Select(x => x.Trim()).ToArray()));
             }
 
             if (!devices.Any())

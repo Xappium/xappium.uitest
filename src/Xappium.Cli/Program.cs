@@ -19,8 +19,6 @@ namespace Xappium
     {
         private const string ConfigFileName = "uitest.json";
 
-        private int sdkVersion = 29;
-
         private FileInfo UITestProjectPathInfo => string.IsNullOrEmpty(UITestProjectPath) ? null : new FileInfo(UITestProjectPath);
 
         private FileInfo DeviceProjectPathInfo => string.IsNullOrEmpty(DeviceProjectPath) ? null : new FileInfo(DeviceProjectPath);
@@ -68,6 +66,11 @@ namespace Xappium
             ShortName = "l")]
         public LogLevel LogLevel { get; } = LogLevel.Normal;
 
+        [Option(Description = "Specifies the Android SDK version to ensure is installed for the Emulator",
+            LongName = "android-sdk",
+            ShortName = "droid")]
+        public int? AndroidSdk { get; }
+
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members",
             Justification = "Called by McMaster")]
         private async Task<int> OnExecuteAsync(CancellationToken cancellationToken)
@@ -111,9 +114,6 @@ namespace Xappium
 
                 if (cancellationToken.IsCancellationRequested)
                     return 0;
-
-                if (appProject is DotNetMauiProjectFile && appProject.Platform == "Android")
-                    sdkVersion = 30;
 
                 await GenerateTestConfig(headBin, uiTestBin, appProject.Platform, cancellationToken).ConfigureAwait(false);
 
@@ -211,18 +211,22 @@ namespace Xappium
                     // Ensure latest CmdLine tools are installed
                     await SdkManager.InstallLatestCommandLineTools(cancellationToken).ConfigureAwait(false);
 
+                    var sdkVersion = ApkHelper.GetAndroidSdkVersion(AndroidSdk, headBin);
+                    Logger.WriteLine($"Targeting Android Sdk: {sdkVersion}", LogLevel.Minimal);
+
                     // Check for connected device
                     if (!await Adb.DeviceIsConnected(cancellationToken))
                     {
                         // Ensure SDK Installed
                         await SdkManager.EnsureSdkIsInstalled(sdkVersion, cancellationToken).ConfigureAwait(false);
 
+                        var emulatorName = $"{AvdManager.DefaultUITestEmulatorName}{sdkVersion}";
                         // Ensure Emulator Exists
-                        if (!(await Emulator.ListEmulators(cancellationToken)).Any(x => x == AvdManager.DefaultUITestEmulatorName))
-                            await AvdManager.InstallEmulator(sdkVersion, cancellationToken);
+                        if (!(await Emulator.ListEmulators(cancellationToken)).Any(x => x == emulatorName))
+                            await AvdManager.InstallEmulator(emulatorName, sdkVersion, cancellationToken);
 
                         // Start Emulator
-                        await Emulator.StartEmulator(AvdManager.DefaultUITestEmulatorName, cancellationToken).ConfigureAwait(false);
+                        await Emulator.StartEmulator(emulatorName, cancellationToken).ConfigureAwait(false);
                     }
 
                     var emulator = (await Adb.ListDevices(cancellationToken).ConfigureAwait(false)).First();

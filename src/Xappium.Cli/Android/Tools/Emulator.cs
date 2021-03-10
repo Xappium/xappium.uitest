@@ -131,7 +131,7 @@ namespace Xappium.Android
         public static async Task<IEnumerable<string>> ListEmulators(CancellationToken cancellationToken)
         {
             var output = await ExecuteInternal(b => b.Add("-list-avds"), cancellationToken).ConfigureAwait(false);
-            return output.Split(Environment.NewLine).Where(x => !string.IsNullOrEmpty(x));
+            return output.Split('\n').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x));
         }
 
         internal static async Task<string> ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
