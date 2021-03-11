@@ -9,6 +9,11 @@ namespace Xappium.Cli.Tests.Tools
 {
     public class AppiumTests
     {
+        public AppiumTests()
+        {
+            TestEnvironmentHost.Init();
+        }
+
         [Fact]
         public async Task InstallsAppium()
         {
@@ -18,10 +23,9 @@ namespace Xappium.Cli.Tests.Tools
         [Fact]
         public async Task RunsAppium()
         {
-            var path = Path.Combine(Path.GetTempPath(), nameof(RunsAppium));
+            var path = Path.Combine(TestEnvironmentHost.BaseWorkingDirectory, nameof(RunsAppium));
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
-            Logging.Logger.SetWorkingDirectory(path);
 
             IDisposable disposable = null;
             try

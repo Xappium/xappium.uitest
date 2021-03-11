@@ -11,7 +11,7 @@ namespace Xappium.Cli.Tests
 
         public TrxReaderTests()
         {
-            XUnitLogger.Init();
+            TestEnvironmentHost.Init();
         }
 
         [Fact]

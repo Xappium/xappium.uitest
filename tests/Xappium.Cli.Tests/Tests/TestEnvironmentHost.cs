@@ -4,11 +4,13 @@ using Xappium.Logging;
 
 namespace Xappium.Cli.Tests
 {
-    public class XUnitLogger
+    public class TestEnvironmentHost
     {
+        public static readonly string BaseWorkingDirectory = Path.Combine(Environment.CurrentDirectory, "test");
+        
         public static void Init()
         {
-            var testDir = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "test"));
+            var testDir = new DirectoryInfo(BaseWorkingDirectory);
             if (testDir.Exists)
                 testDir.Delete(true);
 

@@ -8,7 +8,7 @@ namespace Xappium.Cli.Tests.Android
     {
         public AvdManagerTests()
         {
-            XUnitLogger.Init();
+            TestEnvironmentHost.Init();
         }
 
         [Fact]
