@@ -35,7 +35,7 @@ namespace Xappium.Logging
             Console.WriteLine(message);
             Console.ResetColor();
 
-            File.AppendAllLines(Path.Combine(logDirectory, logDirectory), new[] { message });
+            File.AppendAllLines(Path.Combine(logDirectory, logfile), new[] { message });
         }
 
         public static void WriteError(Exception ex) =>
