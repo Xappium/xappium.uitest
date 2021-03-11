@@ -4,6 +4,13 @@ trigger:
     include:
     - master
 
+pr:
+  branches:
+    include:
+      - master
+
+name: $(Build.BuildId)
+
 variables:
   - name: DotNet.Cli.Telemtry.OptOut
     value: true
