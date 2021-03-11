@@ -1,16 +1,18 @@
+using System;
 using TestApp.UITests.Pages;
 using Xappium.UITest;
 using Xunit;
 
 namespace TestApp.UITests
 {
-    public class AppTests : IClassFixture<AppFixture>
+    public class AppTests : IDisposable
     {
         private ITestEngine Engine { get; }
 
-        public AppTests(AppFixture fixture)
+        public AppTests()
         {
-            Engine = fixture.Engine;
+            AppManager.StartApp();
+            Engine = AppManager.Engine;
         }
 
         [Fact]
@@ -29,6 +31,11 @@ namespace TestApp.UITests
 
             new MainPage()
                 .ValidateWelcomeMessage();
+        }
+
+        public void Dispose()
+        {
+            Engine.StopApp();
         }
     }
 }

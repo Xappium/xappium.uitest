@@ -1,21 +1,6 @@
-﻿using System;
-using Xappium.UITest;
-
-namespace TestApp.UITests
+﻿namespace TestApp.UITests
 {
-    public sealed class AppFixture : IDisposable
+    public sealed class AppFixture
     {
-        public AppFixture()
-        {
-            AppManager.StartApp();
-            Engine = AppManager.Engine;
-        }
-
-        public ITestEngine Engine { get; }
-
-        public void Dispose()
-        {
-            Engine.StopApp();
-        }
     }
 }
