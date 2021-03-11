@@ -14,6 +14,10 @@ name: $(Build.BuildId)
 variables:
   - name: DotNet.Cli.Telemtry.OptOut
     value: true
+  - name: EnableWindowsCITests
+    value: false
+  - name: EnableAndroidTests
+    value: false
 
 stages:
   - stage: build
@@ -83,6 +87,7 @@ stages:
 
       - job: unit_tests_windows
         displayName: Unit Tests (Windows)
+        condition: and(succeeded(), eq(variables['EnableWindowsCITests'], true))
         pool:
           vmImage: windows-latest
           demands:
@@ -111,6 +116,7 @@ stages:
 
       - job: android_uitest
         displayName: 'Android UI Tests'
+        condition: and(succeeded(), eq(variables['EnableAndroidTests'], true))
         pool:
           vmImage: macOS-latest
           demands:

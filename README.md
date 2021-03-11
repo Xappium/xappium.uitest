@@ -21,6 +21,8 @@ This repo is currently evolving and may experience breaking API changes. Communi
 | CLI tool | Done |
 | Azure Pipelines | Needs Help |
 
+**NOTE** Android tools are tested and do work on Mac, however they do not currently work on Windows hosts. If you're an Android Guru and would like to help get this working on Windows hosts I'd love the PR!
+
 ## Configuration
 
 The UI Test AppManager is configured through a combination of local, embedded, and environment. This gives you a wide variety of configuration options and ways to customize your build. For example you may provide a `uitest.json` that contains common attributes for all builds... this will be automatically copied to the UI Test output directory. You may also conditionally embed a `uitest.ios.json` or `uitest.android.json` with the logical name `uitest.json`. Finally you may use various Environment variables to set the configuration dynamically in a CI build. The order of precedence is as follows:
