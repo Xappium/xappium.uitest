@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="91509fdc-8c16-493b-b9ad-b5831373b146" name="@my-machine 2021-03-09 19:13:38" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2021-03-09T19:13:38.3273880-08:00" queuing="2021-03-09T19:13:38.3273880-08:00" start="2021-03-09T19:13:12.2419640-08:00" finish="2021-03-09T19:13:40.6344300-08:00" />
+  <TestSettings name="default" id="09ee4a4e-d536-45b3-8f71-b29ae5144a09">
+    <Deployment runDeploymentRoot="_my-machine_2021-03-09_19_13_38" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a4bc667a-05a5-4c39-8f2e-5f7b80852192" testId="84168d84-ecc4-f6b8-035c-a175da356cd5" testName="TestApp.UITests.AppTests.LogsIntoMainPage" computerName="my-machine" duration="00:00:02.4714161" startTime="2021-03-09T19:13:39.5015730-08:00" endTime="2021-03-09T19:13:39.5015780-08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4bc667a-05a5-4c39-8f2e-5f7b80852192" />
+    <UnitTestResult executionId="fbc76972-5341-4e92-b744-8a6937033d57" testId="c0846436-ac78-f563-2d7f-a133f95ca983" testName="TestApp.UITests.AppTests.AppLaunches" computerName="my-machine" duration="00:00:00.2366927" startTime="2021-03-09T19:13:37.0301830-08:00" endTime="2021-03-09T19:13:37.0302570-08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fbc76972-5341-4e92-b744-8a6937033d57" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="TestApp.UITests.AppTests.AppLaunches" storage="/users/foo/repos/xappium.uitest/uitest/bin/uitest/testapp.uitests.dll" id="c0846436-ac78-f563-2d7f-a133f95ca983">
+      <Execution id="fbc76972-5341-4e92-b744-8a6937033d57" />
+      <TestMethod codeBase="/users/foo/repos/Xappium.UITest/UITest/bin/uitest/TestApp.UITests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="TestApp.UITests.AppTests" name="AppLaunches" />
+    </UnitTest>
+    <UnitTest name="TestApp.UITests.AppTests.LogsIntoMainPage" storage="/users/foo/repos/xappium.uitest/uitest/bin/uitest/testapp.uitests.dll" id="84168d84-ecc4-f6b8-035c-a175da356cd5">
+      <Execution id="a4bc667a-05a5-4c39-8f2e-5f7b80852192" />
+      <TestMethod codeBase="/users/foo/repos/Xappium.UITest/UITest/bin/uitest/TestApp.UITests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="TestApp.UITests.AppTests" name="LogsIntoMainPage" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="84168d84-ecc4-f6b8-035c-a175da356cd5" executionId="a4bc667a-05a5-4c39-8f2e-5f7b80852192" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c0846436-ac78-f563-2d7f-a133f95ca983" executionId="fbc76972-5341-4e92-b744-8a6937033d57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Logging TestHost Diagnostics in file: /users/foo/repos/Xappium.UITest/UITest/logs/vstest.host.21-03-09_19-13-12_26864_4.log
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.4.3+1b45f5407b (64-bit .NET Core 3.1.12)
+[xUnit.net 00:00:00.66]   Discovering: TestApp.UITests
+[xUnit.net 00:00:00.69]   Discovered:  TestApp.UITests
+[xUnit.net 00:00:00.70]   Starting:    TestApp.UITests
+[xUnit.net 00:00:27.80]   Finished:    TestApp.UITests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

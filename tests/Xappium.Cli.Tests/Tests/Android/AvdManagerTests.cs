@@ -1,10 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xappium.Android;
-using Xappium.Logging;
 using Xunit;
 
-namespace Xappium.Cli.Tests
+namespace Xappium.Cli.Tests.Android
 {
     public class AvdManagerTests
     {
@@ -17,18 +15,20 @@ namespace Xappium.Cli.Tests
         public async Task InstallsEmulator()
         {
             var devices = await Emulator.ListEmulators(default);
-            if (devices.Any(x => x == AvdManager.DefaultUITestEmulatorName))
+            var emulatorName = $"{nameof(AvdManagerTests)}_{nameof(InstallsEmulator)}";
+            foreach (var device in devices)
             {
-                await AvdManager.DeleteEmulator(default);
+                if (device.StartsWith(AvdManager.DefaultUITestEmulatorName) || device == emulatorName)
+                    await AvdManager.DeleteEmulator(device, default);
             }
 
             devices = await Emulator.ListEmulators(default);
 
             Assert.DoesNotContain(AvdManager.DefaultUITestEmulatorName, devices);
-            await AvdManager.InstallEmulator(29, default);
+            await AvdManager.InstallEmulator(emulatorName, 29, default);
             devices = await Emulator.ListEmulators(default);
 
-            Assert.Contains(AvdManager.DefaultUITestEmulatorName, devices);
+            Assert.Contains(emulatorName, devices);
         }
     }
 }

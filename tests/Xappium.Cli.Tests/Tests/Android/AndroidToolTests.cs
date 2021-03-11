@@ -1,8 +1,7 @@
-using System;
-using Xunit;
 using Xappium.Android;
+using Xunit;
 
-namespace Xappium.Cli.Tests
+namespace Xappium.Cli.Tests.Android
 {
     public class AndroidToolTests
     {

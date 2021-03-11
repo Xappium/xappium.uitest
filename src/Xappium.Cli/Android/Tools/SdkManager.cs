@@ -31,7 +31,7 @@ namespace Xappium.Android
             return ExecuteInternal(o => o.Add("--install").Add("cmdline-tools;latest"), cancellationToken);
         }
 
-        private static async Task ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
+        internal static async Task ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
         {
             ThrowIfNull(ToolPath, nameof(SdkManager));
 
