@@ -27,6 +27,9 @@ namespace Xappium.Cli.Tests.Tools
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
+            // Ensure Appium is installed for test...
+            await Appium.Install(default);
+
             IDisposable disposable = null;
             try
             {
