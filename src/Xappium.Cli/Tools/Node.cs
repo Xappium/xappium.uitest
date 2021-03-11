@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -43,23 +44,29 @@ namespace Xappium.Tools
         public static async Task<bool> InstallPackage(string packageName, CancellationToken cancellationToken)
         {
             Console.WriteLine($"npm install -g {packageName}");
-            var stdErrBuffer = new StringBuilder();
+            var isMac = EnvironmentHelper.IsRunningOnMac;
+            var errorLines = new List<string>();
             var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
+            var stdErr = PipeTarget.ToDelegate(l =>
+            {
+                if (string.IsNullOrEmpty(l) || (isMac && l.Contains("did not detect a Windows system")))
+                    return;
+                errorLines.Add(l);
+            });
             await Cli.Wrap("npm")
                 .WithArguments($"install -g {packageName}")
                 .WithValidation(CommandResultValidation.None)
                 .WithStandardOutputPipe(stdOut)
-                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardErrorPipe(stdErr)
                 .ExecuteAsync(cancellationToken);
 
             if (cancellationToken.IsCancellationRequested)
                 return false;
 
-            var errorOutput = stdErrBuffer.ToString().Trim();
-            if (string.IsNullOrEmpty(errorOutput))
+            if (errorLines.Any())
                 return true;
 
-            throw new Exception(errorOutput);
+            throw new Exception(string.Join(Environment.NewLine, errorLines));
         }
     }
 }
