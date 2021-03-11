@@ -9,7 +9,6 @@ namespace Xappium.Cli.Tests
     {
         [Theory]
         [InlineData("SampleAndroidProject.xml", typeof(AndroidProjectFile))]
-        [InlineData("SampleiOSProject.xml", typeof(iOSProjectFile))]
         [InlineData("SampleDotNetMultiTargetProject.xml", typeof(DotNetMauiProjectFile))]
         [InlineData("SampleConsoleApp.xml", typeof(DotNetSdkProjectFile))]
         public void FromFileGeneratesCorrectProjectType(string fileName, Type expectedProjectType)
@@ -22,6 +21,24 @@ namespace Xappium.Cli.Tests
             Assert.Null(ex);
             Assert.NotNull(proj);
             Assert.IsType(expectedProjectType, proj);
+        }
+
+        [Fact]
+        public void HandlesIOSProjectFile()
+        {
+            var filePath = new FileInfo(Path.Combine("Resources", "SampleiOSProject.xml"));
+            var output = new DirectoryInfo(Path.Combine("test-gen", "SampleiOSProject", "bin"));
+            CSProjFile proj = null;
+            var ex = Record.Exception(() => proj = CSProjFile.Load(filePath, output, "iOS"));
+
+#if WINDOWS_NT
+            Assert.NotNull(ex);
+            Assert.IsType<PlatformNotSupportedException>(ex);
+#else
+            Assert.Null(ex);
+            Assert.NotNull(proj);
+            Assert.IsType<iOSProjectFile>(proj);
+#endif
         }
 
         [Theory]

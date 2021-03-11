@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
     <RootNamespace>Xappium.Cli</RootNamespace>
+    <DefineContants Condition=" '$(OS)' == 'Windows_NT' ">$(DefineContants);WINDOWS_NT</DefineContants>
   </PropertyGroup>
 
   <ItemGroup>
