@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -24,18 +25,24 @@ namespace Xappium.Tools
                         RedirectStandardOutput = true
                     },
                 };
-                process.Start();
-                while (!process.StandardOutput.EndOfStream)
+                try
                 {
-                    var line = process.StandardOutput.ReadLine();
-                    if (!string.IsNullOrEmpty(line))
+                    process.Start();
+                    while (!process.StandardOutput.EndOfStream)
                     {
-                        Logger.WriteLine($"Appium: {line} installed", LogLevel.Normal);
-                        return line;
+                        var line = process.StandardOutput.ReadLine();
+                        if (!string.IsNullOrEmpty(line))
+                        {
+                            Logger.WriteLine($"Appium: {line} installed", LogLevel.Normal);
+                            return line;
+                        }
                     }
                 }
+                catch(Win32Exception)
+                {
+                    Logger.WriteWarning("Appium is not currently installed");
+                }
 
-                Logger.WriteWarning("Appium is not currently installed");
                 return null;
             }
         }
