@@ -11,11 +11,16 @@ namespace Xappium.Cli.Tests.Android
             TestEnvironmentHost.Init();
         }
 
-        [Fact]
-        public async Task InstallsEmulator()
+        [Theory]
+        [InlineData(29)]
+        [InlineData(30)]
+        public async Task InstallsEmulator(int sdkVersion)
         {
+            // We need to ensure the sdk is installed...
+            await SdkManager.EnsureSdkIsInstalled(sdkVersion, default);
+
             var devices = await Emulator.ListEmulators(default);
-            var emulatorName = $"{nameof(AvdManagerTests)}_{nameof(InstallsEmulator)}";
+            var emulatorName = $"{nameof(AvdManagerTests)}_{nameof(InstallsEmulator)}{sdkVersion}";
             foreach (var device in devices)
             {
                 if (device.StartsWith(AvdManager.DefaultUITestEmulatorName) || device == emulatorName)
@@ -25,7 +30,7 @@ namespace Xappium.Cli.Tests.Android
             devices = await Emulator.ListEmulators(default);
 
             Assert.DoesNotContain(AvdManager.DefaultUITestEmulatorName, devices);
-            await AvdManager.InstallEmulator(emulatorName, 29, default);
+            await AvdManager.InstallEmulator(emulatorName, sdkVersion, default);
             devices = await Emulator.ListEmulators(default);
 
             Assert.Contains(emulatorName, devices);

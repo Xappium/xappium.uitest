@@ -85,15 +85,25 @@ namespace Xappium.Android
             configure(builder);
             var args = builder.Build();
             Logger.WriteLine($"{toolPath} {args}", LogLevel.Normal);
-            var stdErrBuffer = new StringBuilder();
+            var errorBuffer = new List<string>();
             var stdOutBuffer = new StringBuilder();
             var stdOut = PipeTarget.Merge(PipeTarget.ToStringBuilder(stdOutBuffer),
                 PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Verbose)));
 
+            var stdErr = PipeTarget.ToDelegate(l =>
+            {
+                if (string.IsNullOrEmpty(l))
+                    return;
+                else if (l.Contains("Warning: "))
+                    Logger.WriteWarning(l);
+                else
+                    errorBuffer.Add(l);
+            });
+
             var cmd = Cli.Wrap(toolPath)
                 .WithArguments(args)
                 .WithValidation(CommandResultValidation.None)
-                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardErrorPipe(stdErr)
                 .WithStandardOutputPipe(stdOut);
 
             if (stdInput != null)
@@ -101,9 +111,8 @@ namespace Xappium.Android
 
             await cmd.ExecuteAsync(cancellationToken);
 
-            var stdErr = stdErrBuffer.ToString().Trim();
-            if (!string.IsNullOrEmpty(stdErr))
-                throw new Exception(stdErr);
+            if (errorBuffer.Any())
+                throw new Exception(string.Join(Environment.NewLine, errorBuffer));
 
             return stdOutBuffer.ToString().Trim();
         }
