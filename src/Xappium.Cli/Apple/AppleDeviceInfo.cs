@@ -32,27 +32,27 @@ namespace Xappium.Apple
         [JsonIgnore]
         public string OSVersion { get; set; }
 
-        public void Boot()
-        {
-            Console.WriteLine($"Booting {Name} simulator.");
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo("xcrun", $"simctl boot {Udid}")
-                {
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true
-                }
-            };
-            process.Start();
-            process.WaitForExit();
+        // public void Boot()
+        // {
+        //     Console.WriteLine($"Booting {Name} simulator.");
+        //     using var process = new Process
+        //     {
+        //         StartInfo = new ProcessStartInfo("xcrun", $"simctl boot {Udid}")
+        //         {
+        //             CreateNoWindow = true,
+        //             RedirectStandardOutput = true
+        //         }
+        //     };
+        //     process.Start();
+        //     process.WaitForExit();
 
-            var devices = AppleSimulator.GetAvailableSimulators();
-            State = devices.First(x => x.Udid == Udid).State;
+        //     var devices = AppleSimulator.GetAvailableSimulators();
+        //     State = devices.First(x => x.Udid == Udid).State;
 
-            if (State == SimulatorState.Booted)
-                Console.WriteLine($"{Name} booted.");
-            else
-                Console.WriteLine($"{Name} was unable to complete booting.");
-        }
+        //     if (State == SimulatorState.Booted)
+        //         Console.WriteLine($"{Name} booted.");
+        //     else
+        //         Console.WriteLine($"{Name} was unable to complete booting.");
+        // }
     }
 }
