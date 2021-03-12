@@ -29,9 +29,9 @@ namespace Xappium.UITest.Platforms
             //AddAdditionalCapability(options, "isHeadless", true);
             AddAdditionalCapability(options, IOSMobileCapabilityType.LaunchTimeout, 60000);
             AddAdditionalCapability(options, "appium:screenshotQuality", 2);
-            AddAdditionalCapability(options, "appium:showIOSLog", true);
+            //AddAdditionalCapability(options, "appium:showIOSLog", true);
 
-            return new IOSDriver<IOSElement>(config.AppiumServer, options, TimeSpan.FromSeconds(90));
+            return new IOSDriver<IOSElement>(config.AppiumServer, options);
         }
 
         protected override IUIElement CreateUIElement(IOSElement nativeElement) =>
