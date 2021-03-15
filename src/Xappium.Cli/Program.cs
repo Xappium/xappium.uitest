@@ -235,7 +235,16 @@ namespace Xappium
                     config.OSVersion = $"{emulator.SdkVersion}";
                     break;
                 case "iOS":
-                    AppleSimulator.ShutdownAllSimulators();
+                    // Install Helpers for testing on iOS Devices / Simulators
+                    await Gem.InstallXcPretty(cancellationToken).ConfigureAwait(false);
+                    await Brew.InstallAppleSimUtils(cancellationToken).ConfigureAwait(false);
+                    await Brew.InstallFFMPEG(cancellationToken).ConfigureAwait(false);
+                    await Brew.InstallIdbCompanion(cancellationToken).ConfigureAwait(false);
+                    await Pip.InstallIdbClient(cancellationToken).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+
                     var device = AppleSimulator.GetSimulator();
                     if (device is null)
                         throw new NullReferenceException("Unable to locate the Device");
@@ -243,6 +252,7 @@ namespace Xappium
                     config.DeviceName = device.Name;
                     config.UDID = device.Udid;
                     config.OSVersion = device.OSVersion;
+                    AppleSimulator.ShutdownAllSimulators();
                     break;
             }
 
