@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,10 +49,12 @@ namespace Xappium.Tools
 
             var stdErr = stdErrBuffer.ToString().Trim();
             if (!string.IsNullOrEmpty(stdErr))
-                throw new Exception(stdErr);
-
-            // if (result.ExitCode != 0)
-            //     throw new Exception("Gem exited with non-zero exit code.");
+            {
+                if (stdErr.Split('\n').Select(x => x.Trim()).All(x => x.StartsWith("Warning:", StringComparison.InvariantCultureIgnoreCase)))
+                    Logger.WriteWarning(stdErr);
+                else
+                    throw new Exception(stdErr);
+            }
 
             return stdOutBuffer.ToString().Trim();
         }

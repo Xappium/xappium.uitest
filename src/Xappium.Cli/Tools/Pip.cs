@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,18 +13,25 @@ namespace Xappium.Tools
     {
         public static readonly string ToolPath = EnvironmentHelper.GetToolPath("pip3");
 
+        public static Task UpgradePip(CancellationToken cancellationToken) =>
+            ExecuteInternal("python3", b =>
+                b.Add("-m")
+                 .Add("pip")
+                 .Add("install")
+                 .Add("--upgrade")
+                 .Add("pip"), cancellationToken);
+
         public static Task Install(string packageName, CancellationToken cancellationToken) =>
-            ExecuteInternal(b => b.Add("install").Add(packageName), cancellationToken);
+            ExecuteInternal(ToolPath, b => b.Add("install").Add(packageName), cancellationToken);
 
         public static Task InstallIdbClient(CancellationToken cancellationToken) =>
             Install("fb-idb", cancellationToken);
 
-        internal static async Task<string> ExecuteInternal(Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
+        internal static async Task<string> ExecuteInternal(string toolPath, Action<ArgumentsBuilder> configure, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
                 return null;
 
-            var toolPath = ToolPath;
             var builder = new ArgumentsBuilder();
             configure(builder);
             var args = builder.Build();
@@ -42,10 +50,12 @@ namespace Xappium.Tools
 
             var stdErr = stdErrBuffer.ToString().Trim();
             if (!string.IsNullOrEmpty(stdErr))
-                throw new Exception(stdErr);
-
-            // if (result.ExitCode != 0)
-            //     throw new Exception("Pip exited with non-zero exit code.");
+            {
+                if (stdErr.Split('\n').Select(x => x.Trim()).All(x => x.StartsWith("Warning:", StringComparison.InvariantCultureIgnoreCase)))
+                    Logger.WriteWarning(stdErr);
+                else
+                    throw new Exception(stdErr);
+            }
 
             return stdOutBuffer.ToString().Trim();
         }

@@ -236,6 +236,7 @@ namespace Xappium
                     break;
                 case "iOS":
                     // Install Helpers for testing on iOS Devices / Simulators
+                    await Pip.UpgradePip(cancellationToken).ConfigureAwait(false);
                     await Gem.InstallXcPretty(cancellationToken).ConfigureAwait(false);
                     await Brew.InstallAppleSimUtils(cancellationToken).ConfigureAwait(false);
                     await Brew.InstallFFMPEG(cancellationToken).ConfigureAwait(false);
