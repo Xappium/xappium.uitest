@@ -7,11 +7,12 @@ namespace Xappium.Android
 {
     internal static class AndroidTool
     {
+        private static readonly string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        private static readonly string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        private static readonly string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
         static AndroidTool()
         {
-            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             if(EnvironmentHelper.IsRunningOnMac)
             {
                 s_java_home = GetMacOSJavaHome();
@@ -28,39 +29,39 @@ namespace Xappium.Android
                 .Select(x => new FileInfo(x).Directory.FullName)
                 .FirstOrDefault();
             }
-
-            s_androidSdkPaths = new[]
-                {
-                    Path.Combine(userProfile, "AppData", "Local", "Android", "Sdk"),
-                    Path.Combine(userProfile, "Library", "Android", "sdk"),
-                    Path.Combine(userProfile, "android-toolchain", "sdk"),
-                    Path.Combine(userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx"),
-                    Path.Combine(programFiles, "Android", "android-sdk"),
-                    Path.Combine(programFilesX86, "Android", "android-sdk"),
-                }
-                .Where(x => Directory.Exists(x))
-                .ToArray();
-
-            s_searchPaths = s_androidSdkPaths.SelectMany(x => new[]
-                {
-                    x,
-                    Path.Combine(x, "cmdline-tools", "latest", "bin"),
-                    Path.Combine(x, "cmdline-tools", "2.0", "bin"),
-                    Path.Combine(x, "cmdline-tools", "1.0", "bin"),
-                    Path.Combine(x, "emulator"),
-                    Path.Combine(x, "tools"),
-                    Path.Combine(x, "tools", "bin"),
-                    Path.Combine(x, "platform-tools")
-                })
-                .Where(x => Directory.Exists(x))
-                .ToArray();
         }
 
         private static readonly string s_java_home;
 
-        private static readonly string[] s_androidSdkPaths;
+        private static string[] s_androidSdkPaths =>
+            new[]
+            {
+                Environment.GetEnvironmentVariable("ANDROID_HOME"),
+                Environment.GetEnvironmentVariable("ANDROID_SDK_ROOT"),
+                Path.Combine(userProfile, "AppData", "Local", "Android", "Sdk"),
+                Path.Combine(userProfile, "Library", "Android", "sdk"),
+                Path.Combine(userProfile, "android-toolchain", "sdk"),
+                Path.Combine(userProfile, "Library", "Developer", "Xamarin", "android-sdk-macosx"),
+                Path.Combine(programFiles, "Android", "android-sdk"),
+                Path.Combine(programFilesX86, "Android", "android-sdk"),
+            }
+            .Where(x => !string.IsNullOrEmpty(x) && Directory.Exists(x))
+            .ToArray();
 
-        private static readonly string[] s_searchPaths;
+        private static string[] s_searchPaths =>
+            s_androidSdkPaths.SelectMany(x => new[]
+            {
+                x,
+                Path.Combine(x, "cmdline-tools", "latest", "bin"),
+                Path.Combine(x, "cmdline-tools", "2.0", "bin"),
+                Path.Combine(x, "cmdline-tools", "1.0", "bin"),
+                Path.Combine(x, "emulator"),
+                Path.Combine(x, "tools"),
+                Path.Combine(x, "tools", "bin"),
+                Path.Combine(x, "platform-tools")
+            })
+            .Where(x => Directory.Exists(x))
+            .ToArray();
 
         private static string GetMacOSJavaHome()
         {
