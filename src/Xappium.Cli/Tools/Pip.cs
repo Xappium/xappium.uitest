@@ -44,8 +44,8 @@ namespace Xappium.Tools
             if (!string.IsNullOrEmpty(stdErr))
                 throw new Exception(stdErr);
 
-            if (result.ExitCode != 0)
-                throw new Exception("Pip exited with non-zero exit code.");
+            // if (result.ExitCode != 0)
+            //     throw new Exception("Pip exited with non-zero exit code.");
 
             return stdOutBuffer.ToString().Trim();
         }
