@@ -1,4 +1,5 @@
-﻿using Xappium.Tools;
+﻿using FluentAssertions;
+using Xappium.Tools;
 using Xunit;
 
 namespace Xappium.Cli.Tests.Tools
@@ -8,7 +9,7 @@ namespace Xappium.Cli.Tests.Tools
         [Fact]
         public void LocatesMSBuildPath()
         {
-            Assert.False(string.IsNullOrEmpty(MSBuild.ToolPath));
+            MSBuild.ToolPath.Should().NotBeNullOrEmpty();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Xappium.Tools;
+﻿using FluentAssertions;
+using Xappium.Tools;
 using Xunit;
 
 namespace Xappium.Cli.Tests.Tools
@@ -8,13 +9,13 @@ namespace Xappium.Cli.Tests.Tools
         [Fact]
         public void NodeIsInstalled()
         {
-            Assert.True(Node.IsInstalled);
+            Node.IsInstalled.Should().BeTrue();
         }
 
         [Fact]
         public void NodeVersionIsNotNull()
         {
-            Assert.False(string.IsNullOrEmpty(Node.Version));
+            Node.Version.Should().NotBeNullOrEmpty();
         }
     }
 }

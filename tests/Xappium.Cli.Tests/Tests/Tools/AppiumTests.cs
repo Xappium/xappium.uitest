@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Xappium.Tools;
 using Xunit;
 
@@ -34,16 +35,16 @@ namespace Xappium.Cli.Tests.Tools
             try
             {
                 var ex = await Record.ExceptionAsync(async () => disposable = await Appium.Run(path));
-                Assert.Null(ex);
-                Assert.NotNull(disposable);
+
+                ex.Should().BeNull();
+                disposable.Should().NotBeNull();
 
                 await AssertAppiumIsRunning(true);
                 disposable.Dispose();
                 disposable = null;
                 ex = await Record.ExceptionAsync(() => AssertAppiumIsRunning(false));
-                Assert.NotNull(ex);
-                Assert.IsType<HttpRequestException>(ex);
-                Assert.Equal("Connection refused", ex.Message);
+                ex.Should().NotBeNull().And.BeOfType<HttpRequestException>();
+                ex.Message.Should().BeSameAs("Connection refused");
             }
             finally
             {
@@ -56,7 +57,8 @@ namespace Xappium.Cli.Tests.Tools
             await Task.Delay(1500);
             using var client = new HttpClient();
             using var respose = await client.GetAsync("http://127.0.0.1:4723/wd/hub/status");
-            Assert.Equal(isRunning, respose.IsSuccessStatusCode);
+
+            respose.IsSuccessStatusCode.Should().Be(isRunning);
         }
     }
 }

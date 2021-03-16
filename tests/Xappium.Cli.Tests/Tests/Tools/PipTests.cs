@@ -14,7 +14,7 @@ namespace Xappium.Cli.Tests.Tools
             TestEnvironmentHost.Init();
         }
 
-        [Fact]
+        [MacOSFact]
         public async Task InstallsIdbClient()
         {
             var ex = await Record.ExceptionAsync(() => Pip.InstallIdbClient(default));

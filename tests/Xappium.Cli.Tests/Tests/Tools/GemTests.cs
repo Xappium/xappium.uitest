@@ -1,7 +1,5 @@
-using System;
-using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Xappium.Tools;
 using Xunit;
 
@@ -14,12 +12,11 @@ namespace Xappium.Cli.Tests.Tools
             TestEnvironmentHost.Init();
         }
 
-        [Fact]
+        [MacOSFact]
         public async Task InstallsXcPretty()
         {
             var ex = await Record.ExceptionAsync(() => Gem.InstallXcPretty(default));
-
-            Assert.Null(ex);
+            ex.Should().BeNull();
         }
     }
 }
