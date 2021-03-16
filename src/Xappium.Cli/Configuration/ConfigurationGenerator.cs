@@ -83,12 +83,12 @@ namespace Xappium.Configuration
         private static async Task ConfigureForIOSTests(TestConfiguration config, CancellationToken cancellationToken)
         {
             // Install Helpers for testing on iOS Devices / Simulators
-            await Pip.UpgradePip(cancellationToken).ConfigureAwait(false);
-            await Gem.InstallXcPretty(cancellationToken).ConfigureAwait(false);
-            await Brew.InstallAppleSimUtils(cancellationToken).ConfigureAwait(false);
-            await Brew.InstallFFMPEG(cancellationToken).ConfigureAwait(false);
-            //await Brew.InstallIdbCompanion(cancellationToken).ConfigureAwait(false);
-            //await Pip.InstallIdbClient(cancellationToken).ConfigureAwait(false);
+            // await Pip.UpgradePip(cancellationToken).ConfigureAwait(false);
+            // await Gem.InstallXcPretty(cancellationToken).ConfigureAwait(false);
+            // await Brew.InstallAppleSimUtils(cancellationToken).ConfigureAwait(false);
+            // await Brew.InstallFFMPEG(cancellationToken).ConfigureAwait(false);
+            // await Brew.InstallIdbCompanion(cancellationToken).ConfigureAwait(false);
+            // await Pip.InstallIdbClient(cancellationToken).ConfigureAwait(false);
 
             if (cancellationToken.IsCancellationRequested)
                 return;

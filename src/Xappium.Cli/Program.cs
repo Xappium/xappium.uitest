@@ -109,7 +109,7 @@ namespace Xappium
                 if (cancellationToken.IsCancellationRequested)
                     return 0;
 
-                await ConfigurationGenerator.GenerateTestConfig(headBin, uiTestBin, Platform, ConfigurationPath, BaseWorkingDirectory, AndroidSdk, DisplayGeneratedConfig, cancellationToken);
+                await ConfigurationGenerator.GenerateTestConfig(headBin, uiTestBin, appProject.Platform, ConfigurationPath, BaseWorkingDirectory, AndroidSdk, DisplayGeneratedConfig, cancellationToken);
 
                 if(!await Appium.Install(cancellationToken))
                 {
