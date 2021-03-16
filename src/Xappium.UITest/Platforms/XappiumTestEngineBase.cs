@@ -193,7 +193,7 @@ namespace Xappium.UITest.Platforms
             }
 
             if (!found)
-                throw new NullReferenceException(automationId + " did not contain the text '" + text + "'");
+                Providers.TestFrameworkProvider.Throw(automationId + " did not contain the text '" + text + "'");
         }
 
         public virtual void ScrollTo(string automationId)

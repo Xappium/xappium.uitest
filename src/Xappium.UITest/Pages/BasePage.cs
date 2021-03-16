@@ -1,4 +1,6 @@
-﻿namespace Xappium.UITest.Pages
+﻿using static Xappium.UITest.Providers.TestFrameworkProvider;
+
+namespace Xappium.UITest.Pages
 {
     public abstract class BasePage
     {
@@ -23,9 +25,9 @@
         {
             var message = "Unable to verify on page: " + PageName;
 
-            Engine.WaitForElement(Trait);
+            AssertDoesNotThrowAndIsNotNull(() => Engine.WaitForElement(Trait), message);
+
             Engine.Screenshot("On " + PageName);
-            //Assert.DoesNotThrow(() => Engine.WaitForElement(Trait), message);
         }
 
         /// <summary>
@@ -36,8 +38,7 @@
             //timeout = timeout ?? TimeSpan.FromSeconds(5);
             var message = "Unable to verify *not* on page: " + PageName;
 
-            Engine.WaitForNoElement(Trait);
-            //Assert.DoesNotThrow(() => Engine.WaitForElement(Trait), message);
+            AssertDoesNotThrow(() => Engine.WaitForNoElement(Trait), message);
         }
     }
 }
