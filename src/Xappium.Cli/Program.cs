@@ -1,15 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using Xappium.Android;
-using Xappium.Apple;
 using Xappium.BuildSystem;
+using Xappium.Configuration;
 using Xappium.Logging;
 using Xappium.Tools;
 
@@ -17,8 +13,6 @@ namespace Xappium
 {
     internal class Program
     {
-        private const string ConfigFileName = "uitest.json";
-
         private FileInfo UITestProjectPathInfo => string.IsNullOrEmpty(UITestProjectPath) ? null : new FileInfo(UITestProjectPath);
 
         private FileInfo DeviceProjectPathInfo => string.IsNullOrEmpty(DeviceProjectPath) ? null : new FileInfo(DeviceProjectPath);
@@ -115,7 +109,7 @@ namespace Xappium
                 if (cancellationToken.IsCancellationRequested)
                     return 0;
 
-                await GenerateTestConfig(headBin, uiTestBin, appProject.Platform, cancellationToken).ConfigureAwait(false);
+                await ConfigurationGenerator.GenerateTestConfig(headBin, uiTestBin, Platform, ConfigurationPath, BaseWorkingDirectory, AndroidSdk, DisplayGeneratedConfig, cancellationToken);
 
                 if(!await Appium.Install(cancellationToken))
                 {
@@ -154,114 +148,6 @@ namespace Xappium
                 throw new FileNotFoundException($"The specified UI Test project path does not exist: '{UITestProjectPath}'");
             else if (!DeviceProjectPathInfo.Exists)
                 throw new FileNotFoundException($"The specified Platform head project path does not exist: '{DeviceProjectPath}'");
-        }
-
-        private async Task GenerateTestConfig(string headBin, string uiTestBin, string platform, CancellationToken cancellationToken)
-        {
-            var binDir = new DirectoryInfo(headBin);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-                AllowTrailingCommas = true,
-                IgnoreNullValues = true,
-                PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            };
-
-            var appPath = platform switch
-            {
-                "Android" => binDir.GetFiles().First(x => x.Name.EndsWith("-Signed.apk")).FullName,
-                "iOS" => binDir.GetDirectories().First(x => x.Name.EndsWith(".app")).FullName,
-                null => throw new ArgumentNullException("No platform was specified"),
-                _ => throw new PlatformNotSupportedException($"The {platform} is not supported")
-            };
-
-            var config = new TestConfiguration();
-            var testConfig = Path.Combine(uiTestBin, ConfigFileName);
-            if (!string.IsNullOrEmpty(ConfigurationPath))
-            {
-                if (!File.Exists(ConfigurationPath))
-                    throw new FileNotFoundException($"Could not locate the specified uitest configuration at: '{ConfigurationPath}'");
-                config = JsonSerializer.Deserialize<TestConfiguration>(File.ReadAllText(ConfigurationPath), options);
-            }
-            else if(File.Exists(testConfig))
-            {
-                config = JsonSerializer.Deserialize<TestConfiguration>(File.ReadAllText(testConfig), options);
-            }
-
-            if (config.Capabilities is null)
-                config.Capabilities = new Dictionary<string, string>();
-
-            if (config.Settings is null)
-                config.Settings = new Dictionary<string, string>();
-
-            config.Platform = platform;
-            config.AppPath = appPath;
-
-            if (string.IsNullOrEmpty(config.ScreenshotsPath))
-                config.ScreenshotsPath = Path.Combine(BaseWorkingDirectory, "screenshots");
-
-            switch(platform)
-            {
-                case "Android":
-                    // Ensure WebDrivers are installed
-                    await SdkManager.InstallWebDriver(cancellationToken).ConfigureAwait(false);
-
-                    // Ensure latest CmdLine tools are installed
-                    await SdkManager.InstallLatestCommandLineTools(cancellationToken).ConfigureAwait(false);
-
-                    var sdkVersion = ApkHelper.GetAndroidSdkVersion(AndroidSdk, headBin);
-                    Logger.WriteLine($"Targeting Android Sdk: {sdkVersion}", LogLevel.Minimal);
-
-                    // Check for connected device
-                    if (!await Adb.DeviceIsConnected(cancellationToken))
-                    {
-                        // Ensure SDK Installed
-                        await SdkManager.EnsureSdkIsInstalled(sdkVersion, cancellationToken).ConfigureAwait(false);
-
-                        var emulatorName = $"{AvdManager.DefaultUITestEmulatorName}{sdkVersion}";
-                        // Ensure Emulator Exists
-                        if (!(await Emulator.ListEmulators(cancellationToken)).Any(x => x == emulatorName))
-                            await AvdManager.InstallEmulator(emulatorName, sdkVersion, cancellationToken);
-
-                        // Start Emulator
-                        await Emulator.StartEmulator(emulatorName, cancellationToken).ConfigureAwait(false);
-                    }
-
-                    var emulator = (await Adb.ListDevices(cancellationToken).ConfigureAwait(false)).First();
-                    config.DeviceName = emulator.Name;
-                    config.UDID = emulator.Id;
-                    config.OSVersion = $"{emulator.SdkVersion}";
-                    break;
-                case "iOS":
-                    // Install Helpers for testing on iOS Devices / Simulators
-                    await Pip.UpgradePip(cancellationToken).ConfigureAwait(false);
-                    await Gem.InstallXcPretty(cancellationToken).ConfigureAwait(false);
-                    await Brew.InstallAppleSimUtils(cancellationToken).ConfigureAwait(false);
-                    await Brew.InstallFFMPEG(cancellationToken).ConfigureAwait(false);
-                    await Brew.InstallIdbCompanion(cancellationToken).ConfigureAwait(false);
-                    await Pip.InstallIdbClient(cancellationToken).ConfigureAwait(false);
-
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-
-                    var device = AppleSimulator.GetSimulator();
-                    if (device is null)
-                        throw new NullReferenceException("Unable to locate the Device");
-
-                    config.DeviceName = device.Name;
-                    config.UDID = device.Udid;
-                    config.OSVersion = device.OSVersion;
-                    AppleSimulator.ShutdownAllSimulators();
-                    break;
-            }
-
-            var jsonOutput = JsonSerializer.Serialize(config, options);
-            File.WriteAllText(testConfig, jsonOutput);
-
-            if(DisplayGeneratedConfig)
-                Logger.WriteLine(jsonOutput, LogLevel.Normal);
         }
     }
 }
