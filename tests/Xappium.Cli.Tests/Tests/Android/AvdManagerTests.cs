@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Xappium.Android;
+using Xappium.Cli.Tests.Tools;
 using Xunit;
 
 namespace Xappium.Cli.Tests.Android
 {
+    [Collection(nameof(Tool))]
     public class AvdManagerTests
     {
         public AvdManagerTests()

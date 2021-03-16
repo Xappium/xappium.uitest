@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Xappium.Cli.Tests.Tools
 {
+    [Collection(nameof(Tool))]
     public class AppiumTests
     {
         public AppiumTests()

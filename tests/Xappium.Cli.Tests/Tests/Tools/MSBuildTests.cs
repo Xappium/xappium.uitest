@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Xappium.Cli.Tests.Tools
 {
+    [Collection(nameof(Tool))]
     public class MSBuildTests
     {
         [Fact]
