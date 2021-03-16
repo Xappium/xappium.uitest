@@ -44,7 +44,7 @@ namespace Xappium.Cli.Tests.Tools
                 disposable = null;
                 ex = await Record.ExceptionAsync(() => AssertAppiumIsRunning(false));
                 ex.Should().NotBeNull().And.BeOfType<HttpRequestException>();
-                ex.Message.Should().BeSameAs("Connection refused");
+                ex.Message.Should().BeEquivalentTo("Connection refused");
             }
             finally
             {
