@@ -12,7 +12,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <IncludeSymbols>True</IncludeSymbols>
     <IncludeSource>True</IncludeSource>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <RootSourceDirectory>$(MSBuildThisFileDirectory)</RootSourceDirectory>
     <IsPackable Condition=" $(IsPackable) == '' ">false</IsPackable>
   </PropertyGroup>
