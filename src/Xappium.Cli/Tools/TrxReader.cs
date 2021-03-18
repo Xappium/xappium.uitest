@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -41,6 +41,9 @@ namespace Xappium.Tools
 
                 if (counters.Failed > 0)
                     Logger.WriteError($"Failed: {counters.Failed}");
+
+                if (counters.Error > 0 || counters.Failed > 0)
+                    Logger.WriteError(testRun.ResultSummary.Output.StdOut);
             }
         }
     }
