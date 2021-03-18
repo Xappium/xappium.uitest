@@ -31,6 +31,11 @@ namespace Xappium.UITest.Platforms
             AddAdditionalCapability(options, "appium:screenshotQuality", 2);
             //AddAdditionalCapability(options, "appium:showIOSLog", true);
 
+            // https://github.com/appium/appium/issues/12094#issuecomment-482593020
+            AddAdditionalCapability(options, "wdaStartupRetries", "4");
+            AddAdditionalCapability(options, "iosInstallPause","8000" );
+            AddAdditionalCapability(options, "wdaStartupRetryInterval", "20000");
+
             return new IOSDriver<IOSElement>(config.AppiumServer, options);
         }
 
