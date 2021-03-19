@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Xappium.UITest.Configuration;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.iOS;
@@ -26,16 +26,17 @@ namespace Xappium.UITest.Platforms
             AddAdditionalCapability(options, MobileCapabilityType.PlatformVersion, config.OSVersion);
             AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "XCUITest");
             AddAdditionalCapability(options, "autoAcceptAlerts", true);
-            //AddAdditionalCapability(options, "isHeadless", true);
-            AddAdditionalCapability(options, IOSMobileCapabilityType.LaunchTimeout, 60000);
+            AddAdditionalCapability(options, "isHeadless", true);
+            AddAdditionalCapability(options, IOSMobileCapabilityType.LaunchTimeout, 90000);
             AddAdditionalCapability(options, "appium:screenshotQuality", 2);
             AddAdditionalCapability(options, "appium:showIOSLog", true);
             AddAdditionalCapability(options, "showXcodeLog", true);
+            AddAdditionalCapability(options, "deviceReadyTimeout", 30);
 
             // https://github.com/appium/appium/issues/12094#issuecomment-482593020
-            AddAdditionalCapability(options, "wdaStartupRetries", "4");
-            AddAdditionalCapability(options, "iosInstallPause","8000" );
-            AddAdditionalCapability(options, "wdaStartupRetryInterval", "20000");
+            AddAdditionalCapability(options, "wdaStartupRetries", "8");
+            AddAdditionalCapability(options, "iosInstallPause","10000" );
+            AddAdditionalCapability(options, "wdaStartupRetryInterval", "30000");
 
             return new IOSDriver<IOSElement>(config.AppiumServer, options);
         }
