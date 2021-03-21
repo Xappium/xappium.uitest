@@ -32,6 +32,7 @@ steps:
     testRunTitle: '${{ parameters.platform }} UI Tests'
     testResultsFiles: '$(Pipeline.Workspace)/**/*.trx'
     failTaskOnFailedTests: true
+    testResultsFormat: XUnit
 
 - task: PublishPipelineArtifact@1
   displayName: Publish Artifacts
