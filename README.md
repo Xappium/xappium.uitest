@@ -21,7 +21,7 @@ This repo is currently evolving and may experience breaking API changes. Communi
 | CLI tool | Done |
 | Azure Pipelines | Needs Help |
 
-**NOTE** Android tools are tested and do work on Mac, however they do not currently work on Windows hosts. If you're an Android Guru and would like to help get this working on Windows hosts I'd love the PR!
+**NOTE:** Android tools are tested and do work on Mac, however they do not currently work on Windows hosts. If you're an Android Guru and would like to help get this working on Windows hosts I'd love the PR!
 
 ## Configuration
 
@@ -52,24 +52,57 @@ Any of these properties can be set by you, however the Xappium.Cli will automati
 
 ### Settings vs Capabilities
 
-At first it may be confusing that the configuration has both settings and capabilities. The Capabilities are explicit to the Appium Driver configuration. It is worth noting that if you need an explicit override to the way that Xappium is configuring a particular capability you have the ability to override that here. Note that the adbPort shown above is provided as an example and is not a required for Android.
+At first it may be confusing that the configuration has both settings and capabilities. The Capabilities are explicit to the Appium Driver configuration. It is worth noting that if you need an explicit override to the way that Xappium is configuring a particular capability you have the ability to override that here. Note that the adbPort shown above is provided as an example and should not be required for Android.
 
 Settings on the other hand have nothing specifically to do with Xappium.UITest or Appium, but rather are exposed to try to make it easier for you to provide values that you can use for your UI Tests such as user credentials.
 
 ### Integrating with your Test Framework
 
-Each test framework is a little different. The guidance shown here is meant as an example of how you might use this with Xunit. It is however not explicitly tied to any specific test framework. First we'll create a fixture that we can inject into our Test class. This will manage starting the app when it is created and stopping the app when we're done and the fixture is disposed by Xunit.
+Each test framework is a little different. The guidance shown here is meant as an example of how you might use this with Xunit. It is however not explicitly tied to any specific test framework. Xappium.UITest has borrowed a little inspiration from FluentAssertions in those cases where Xappium.UITest is explicitly making an Assertion that the Page has loaded, or that an element is present. In these cases we are able to locate the Unit Test framework that you are using and properly raise this to your Test Framework.
+
+#### Setting up a test with Xunit
+
+The first thing we'll want to do is ensure that the tests run sequentially. Since we are connecting to a Simulator / Emulator we can only run a single test at a time. To do this we'll create a CollectionDefinition and disable Parallelization. This will help prevent race conditions as well as ensure we get a new Appium Session with each test.
 
 ```cs
-public sealed class AppFixture : IDisposable
+public class XappiumTests
 {
-    public AppFixture()
+}
+
+[CollectionDefinition(nameof(XappiumTests), DisableParallelization = true)]
+public sealed class XappiumTestsCollection : ICollectionFixture<XappiumTests>
+{
+}
+```
+
+We'll set up our tests using the Page-Object-Model. You can get more information on how this works from [Sweeky's talk](https://www.youtube.com/watch?v=4VR861BWkiU) at the Xamarin Developer Summit. To do this we'll use a helper class from Xappium.UITest:
+
+```cs
+public class LoginPage : BasePage
+{
+    protected override string Trait => "LoginButton";
+}
+```
+
+You'll notice that we provide a trait. This is generally the AutomationId of an element on the page that should be unique that page. Now let's add a test class to validates that our App Starts up and is on the LoginPage.
+
+```cs
+[Collection(nameof(XappiumTests))]
+public class AppTests : IDisposable
+{
+    private ITestEngine Engine { get; }
+
+    public AppTests()
     {
         AppManager.StartApp();
         Engine = AppManager.Engine;
     }
 
-    public ITestEngine Engine { get; }
+    [Fact]
+    public void AppLaunches()
+    {
+        new LoginPage();
+    }
 
     public void Dispose()
     {
@@ -78,34 +111,11 @@ public sealed class AppFixture : IDisposable
 }
 ```
 
-Next we'll create a CollectionDefinition. This is used by Xunit to help us share our fixture between tests.
+Our Test class will be part of the XappiumTests collection which ensures our tests do not run in parallel. It will implement IDisposable so that it can start the app when the constructor is called, and stop the app when it is disposed. This will ensure that each test starts a new session with Appium and screen shots from one test will not overwrite screenshots from another test.
 
-```cs
-[CollectionDefinition(nameof(AppFixture))]
-public sealed class AppFixtureCollection : ICollectionFixture<AppFixture>
-{
-}
-```
+#### Picking a Unit Test Framework
 
-Finally we'll create a test class and write some tests. In this case we'll assume that we have a LoginPage as our initial launch window in the app. For more information on writing UI Tests with the Page-Object-Model see [Sweeky's talk](https://www.youtube.com/watch?v=4VR861BWkiU) from XamDevSummit.
-
-```cs
-public class AppTests : IClassFixture<AppFixture>
-{
-    private ITestEngine Engine { get; }
-
-    public AppTests(AppFixture fixture)
-    {
-        Engine = fixture.Engine;
-    }
-
-    [Fact]
-    public void AppLaunches()
-    {
-        new LoginPage();
-    }
-}
-```
+As mentioned earlier, Xappium UITest takes some inspiration from FluentAssertions, as a result Xappium.UITest is compatible with all major Unit Test Frameworks and will help raise the appropriate Assertions with your Test Framework. The Cli Tool uses `dotnet test` under the hood, so we have zero requirements on which Unit Test framework you are required to use as long as it works with dotnet test. The examples here are with Xunit because it's what I use. But it is not a hard requirement.
 
 ## Using the Cli Tool
 
@@ -118,10 +128,11 @@ The Cli tool is meant to provide an easy to use runner for your UI Tests. In ord
 It's worth noting that the tools here are designed to provide an experience that is tailored to running on an iOS Simulator or Android Emulator. These settings are not customizable.
 
 ```bash
-xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.iOS/TestApp.iOS.csproj
+xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj \
+    -app sample/TestApp.iOS/TestApp.iOS.csproj
 ```
 
-**NOTE** While support for .NET 6 Single Projects is planned it is not currently supported. The Platform specification is part of the planned support for this as we will need to know which platform to build for.
+**NOTE:** .NET 6 Single Projects are theoretically compatible... however this is currently untested (there is an open PR to add a .NET 6 project for testing). The Platform specification is part of the planned support for this as we will need to know which platform to build for.
 
 In addition to the required parameters, a couple more optional parameters can also be provided:
 
