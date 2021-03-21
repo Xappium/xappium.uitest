@@ -30,9 +30,9 @@ steps:
   condition: always()
   inputs:
     testRunTitle: '${{ parameters.platform }} UI Tests'
-    testResultsFiles: '$(Pipeline.Workspace)/**/*.trx'
+    testResultsFiles: '$(Pipeline.Workspace)/UITests/results/*.trx'
     failTaskOnFailedTests: true
-    testResultsFormat: XUnit
+    testResultsFormat: VSTest
 
 - task: PublishPipelineArtifact@1
   displayName: Publish Artifacts
