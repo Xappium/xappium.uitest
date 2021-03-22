@@ -30,9 +30,5 @@
   </ItemGroup>
 
   <Import Project="..\..\src\Xappium.UITest\build\Xappium.UITest.targets" />
-  <!-- <ItemGroup>
-    <None Update="uitest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup> -->
+
 </Project>
