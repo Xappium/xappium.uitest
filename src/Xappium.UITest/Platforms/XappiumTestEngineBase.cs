@@ -12,6 +12,7 @@ using OpenQA.Selenium.Appium.MultiTouch;
 using OpenQA.Selenium.Support.UI;
 using System.Reflection;
 using OpenQA.Selenium.Interactions;
+using Xappium.UITest.Providers;
 
 namespace Xappium.UITest.Platforms
 {
@@ -141,13 +142,14 @@ namespace Xappium.UITest.Platforms
 
             var baseDir = _config.ScreenshotsPath;
 
-            var newFile = string.IsNullOrEmpty(title) ? methodName : $"{methodName}-{title}.jpg";
+            var newFile = string.IsNullOrEmpty(title) ? $"{methodName}.png" : $"{methodName}-{title}.png";
             var newDir = Path.Combine(baseDir, Driver.SessionId.ToString(), namespaceName, className);
             var fullPath = Path.Combine(newDir, newFile);
             Directory.CreateDirectory(newDir);
 
             var s = Driver.GetScreenshot();
             s.SaveAsFile(fullPath, ScreenshotImageFormat.Png);
+            TestFrameworkProvider.AttachFile(fullPath, Path.GetFileNameWithoutExtension(newFile));
         }
 
         public virtual void DismissKeyboard() =>

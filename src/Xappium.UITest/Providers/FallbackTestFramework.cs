@@ -14,5 +14,9 @@
         {
             throw new AssertionFailedException(message);
         }
+
+        public virtual void AttachFile(string filePath, string description)
+        {
+        }
     }
 }

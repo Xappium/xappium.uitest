@@ -34,6 +34,10 @@ namespace Xappium.UITest.Providers
             }
         }
 
+        public virtual void AttachFile(string filePath, string description)
+        {
+        }
+
         protected internal abstract string AssemblyName { get; }
 
         protected abstract string ExceptionFullName { get; }

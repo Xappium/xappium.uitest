@@ -77,6 +77,16 @@ namespace Xappium.UITest.Providers
             testFramework.Throw(message);
         }
 
+        public static void AttachFile(string filePath, string description)
+        {
+            if (testFramework is null)
+            {
+                testFramework = DetectFramework();
+            }
+
+            testFramework.AttachFile(filePath, description);
+        }
+
         private static ITestFramework DetectFramework()
         {
             return AttemptToDetectUsingDynamicScanning() ?? new FallbackTestFramework();

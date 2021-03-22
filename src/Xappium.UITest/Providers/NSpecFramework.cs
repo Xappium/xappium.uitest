@@ -41,5 +41,9 @@ namespace Xappium.UITest.Providers
 
             throw (Exception)Activator.CreateInstance(exceptionType, message);
         }
+
+        public virtual void AttachFile(string filePath, string description)
+        {
+        }
     }
 }
