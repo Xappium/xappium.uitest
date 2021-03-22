@@ -1,20 +1,11 @@
-using System;
 using TestApp.UITests.Pages;
 using Xappium.UITest;
 using Xunit;
 
 namespace TestApp.UITests
 {
-    public class AppTests : IDisposable
+    public class AppTests : XappiumTestBase
     {
-        private ITestEngine Engine { get; }
-
-        public AppTests()
-        {
-            AppManager.StartApp();
-            Engine = AppManager.Engine;
-        }
-
         [Fact]
         public void AppLaunches()
         {
@@ -31,11 +22,6 @@ namespace TestApp.UITests
 
             new MainPage()
                 .ValidateWelcomeMessage();
-        }
-
-        public void Dispose()
-        {
-            Engine.StopApp();
         }
     }
 }

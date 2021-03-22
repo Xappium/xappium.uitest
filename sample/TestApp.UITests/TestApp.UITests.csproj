@@ -25,6 +25,7 @@
     <Folder Include="Pages\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Xappium.UITest.Xunit\Xappium.UITest.Xunit.csproj" />
     <ProjectReference Include="..\..\src\Xappium.UITest\Xappium.UITest.csproj" />
   </ItemGroup>
 
