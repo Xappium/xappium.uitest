@@ -1,4 +1,6 @@
-﻿namespace Xappium.UITest.Providers
+﻿using System.Diagnostics;
+
+namespace Xappium.UITest.Providers
 {
     internal class FallbackTestFramework : ITestFramework
     {
@@ -17,6 +19,11 @@
 
         public virtual void AttachFile(string filePath, string description)
         {
+        }
+
+        public virtual void WriteLine(string message)
+        {
+            Trace.WriteLine(message);
         }
     }
 }

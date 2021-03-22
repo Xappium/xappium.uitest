@@ -38,6 +38,10 @@ namespace Xappium.UITest.Providers
         {
         }
 
+        public virtual void WriteLine(string message)
+        {
+        }
+
         protected internal abstract string AssemblyName { get; }
 
         protected abstract string ExceptionFullName { get; }

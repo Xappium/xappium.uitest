@@ -45,5 +45,9 @@ namespace Xappium.UITest.Providers
         public virtual void AttachFile(string filePath, string description)
         {
         }
+
+        public virtual void WriteLine(string message)
+        {
+        }
     }
 }
