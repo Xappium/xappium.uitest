@@ -35,8 +35,8 @@ namespace Xappium.UITest.Platforms
 
             // https://github.com/appium/appium/issues/12094#issuecomment-482593020
             AddAdditionalCapability(options, "wdaStartupRetries", "8");
-            AddAdditionalCapability(options, "iosInstallPause","10000" );
-            AddAdditionalCapability(options, "wdaStartupRetryInterval", "30000");
+            AddAdditionalCapability(options, "iosInstallPause","15000" );
+            AddAdditionalCapability(options, "wdaStartupRetryInterval", "45000");
 
             return new IOSDriver<IOSElement>(config.AppiumServer, options);
         }

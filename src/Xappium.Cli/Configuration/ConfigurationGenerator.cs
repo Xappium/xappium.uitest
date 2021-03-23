@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -89,6 +89,7 @@ namespace Xappium.Configuration
             // await Brew.InstallFFMPEG(cancellationToken).ConfigureAwait(false);
             // await Brew.InstallIdbCompanion(cancellationToken).ConfigureAwait(false);
             // await Pip.InstallIdbClient(cancellationToken).ConfigureAwait(false);
+            await Task.CompletedTask;
 
             if (cancellationToken.IsCancellationRequested)
                 return;
