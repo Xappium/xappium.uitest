@@ -116,7 +116,6 @@ stages:
 
       - job: android_uitest
         displayName: 'Android UI Tests'
-        condition: and(succeeded(), eq(variables['EnableAndroidTests'], true))
         pool:
           vmImage: macOS-latest
           demands:
