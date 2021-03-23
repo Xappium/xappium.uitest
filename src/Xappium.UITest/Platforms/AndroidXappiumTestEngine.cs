@@ -27,12 +27,19 @@ namespace Xappium.UITest.Platforms
             }
 
             AddAdditionalCapability(options, MobileCapabilityType.PlatformName, "Android");
-            //options.AddAdditionalCapability(MobileCapabilityType.DeviceName, "Android Emulator");
             AddAdditionalCapability(options, MobileCapabilityType.DeviceName, config.DeviceName);
-            AddAdditionalCapability(options, MobileCapabilityType.Udid, config.UDID);
             AddAdditionalCapability(options, "forceEspressoRebuild", true);
             AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "Espresso");
             AddAdditionalCapability(options, "enforceAppInstall", true);
+
+            if(string.IsNullOrEmpty(config.UDID))
+            {
+                options.AddAdditionalCapability(AndroidMobileCapabilityType.Avd, config.DeviceName);
+            }
+            else
+            {
+                AddAdditionalCapability(options, MobileCapabilityType.Udid, config.UDID);
+            }
 
             return new AndroidDriver<AndroidElement>(config.AppiumServer, options, TimeSpan.FromSeconds(90));
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -114,25 +114,29 @@ namespace Xappium.Configuration
             var sdkVersion = ApkHelper.GetAndroidSdkVersion(androidSdk, headBin);
             Logger.WriteLine($"Targeting Android Sdk: {sdkVersion}", LogLevel.Minimal);
 
+            var emulatorName = $"{AvdManager.DefaultUITestEmulatorName}{sdkVersion}";
             // Check for connected device
-            if (!await Adb.DeviceIsConnected(cancellationToken))
+            if (await Adb.DeviceIsConnected(cancellationToken))
+            {
+                var androidDevice = (await Adb.ListDevices(cancellationToken).ConfigureAwait(false)).First();
+                config.DeviceName = androidDevice.Name;
+                config.UDID = androidDevice.Id;
+                config.OSVersion = $"{androidDevice.SdkVersion}";
+            }
+            else
             {
                 // Ensure SDK Installed
                 await SdkManager.EnsureSdkIsInstalled(sdkVersion, cancellationToken).ConfigureAwait(false);
 
-                var emulatorName = $"{AvdManager.DefaultUITestEmulatorName}{sdkVersion}";
                 // Ensure Emulator Exists
                 if (!(await Emulator.ListEmulators(cancellationToken)).Any(x => x == emulatorName))
                     await AvdManager.InstallEmulator(emulatorName, sdkVersion, cancellationToken);
 
-                // Start Emulator
-                await Emulator.StartEmulator(emulatorName, cancellationToken).ConfigureAwait(false);
+                // Let Appium Start and control the Emulator
+                config.DeviceName = emulatorName;
+                config.OSVersion = $"{sdkVersion}";
             }
 
-            var emulator = (await Adb.ListDevices(cancellationToken).ConfigureAwait(false)).First();
-            config.DeviceName = emulator.Name;
-            config.UDID = emulator.Id;
-            config.OSVersion = $"{emulator.SdkVersion}";
         }
 
         private static string GetAppPath(string platform, DirectoryInfo binDir)
