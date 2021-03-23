@@ -28,15 +28,11 @@ namespace Xappium.UITest.Platforms
 
             AddAdditionalCapability(options, MobileCapabilityType.PlatformName, "Android");
             AddAdditionalCapability(options, MobileCapabilityType.DeviceName, config.DeviceName);
-            AddAdditionalCapability(options, "forceEspressoRebuild", true);
+            //AddAdditionalCapability(options, "forceEspressoRebuild", true);
             AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "Espresso");
             AddAdditionalCapability(options, "enforceAppInstall", true);
 
-            if(string.IsNullOrEmpty(config.UDID))
-            {
-                options.AddAdditionalCapability(AndroidMobileCapabilityType.Avd, config.DeviceName);
-            }
-            else
+            if(!string.IsNullOrEmpty(config.UDID))
             {
                 AddAdditionalCapability(options, MobileCapabilityType.Udid, config.UDID);
             }

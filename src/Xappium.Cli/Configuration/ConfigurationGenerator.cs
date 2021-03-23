@@ -114,6 +114,10 @@ namespace Xappium.Configuration
 
             var sdkVersion = ApkHelper.GetAndroidSdkVersion(androidSdk, headBin);
             Logger.WriteLine($"Targeting Android Sdk: {sdkVersion}", LogLevel.Minimal);
+            var appActivity = ApkHelper.GetAppActivity(headBin);
+
+            if(!config.Capabilities.ContainsKey("appActivity"))
+                config.Capabilities.Add("appActivity", appActivity);
 
             var emulatorName = $"{AvdManager.DefaultUITestEmulatorName}{sdkVersion}";
             // Check for connected device
@@ -136,6 +140,9 @@ namespace Xappium.Configuration
                 // Let Appium Start and control the Emulator
                 config.DeviceName = emulatorName;
                 config.OSVersion = $"{sdkVersion}";
+
+                if(!config.Capabilities.ContainsKey("avd"))
+                    config.Capabilities.Add("avd", emulatorName);
             }
 
         }
