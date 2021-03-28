@@ -56,24 +56,9 @@ At first it may be confusing that the configuration has both settings and capabi
 
 Settings on the other hand have nothing specifically to do with Xappium.UITest or Appium, but rather are exposed to try to make it easier for you to provide values that you can use for your UI Tests such as user credentials.
 
-### Integrating with your Test Framework
+### Writing UI Tests with Xappium
 
-Each test framework is a little different. The guidance shown here is meant as an example of how you might use this with Xunit. It is however not explicitly tied to any specific test framework. Xappium.UITest has borrowed a little inspiration from FluentAssertions in those cases where Xappium.UITest is explicitly making an Assertion that the Page has loaded, or that an element is present. In these cases we are able to locate the Unit Test framework that you are using and properly raise this to your Test Framework.
-
-#### Setting up a test with Xunit
-
-The first thing we'll want to do is ensure that the tests run sequentially. Since we are connecting to a Simulator / Emulator we can only run a single test at a time. To do this we'll create a CollectionDefinition and disable Parallelization. This will help prevent race conditions as well as ensure we get a new Appium Session with each test.
-
-```cs
-public class XappiumTests
-{
-}
-
-[CollectionDefinition(nameof(XappiumTests), DisableParallelization = true)]
-public sealed class XappiumTestsCollection : ICollectionFixture<XappiumTests>
-{
-}
-```
+Xappium provides currently provides helpers for both xunit & NUnit. These each have a `XappiumTestBase` class that will properly handle starting and stopping the app between each test. This ensures that Appium assigns a new Test Session between each of your tests. As a result the screenshots you take will be protected from accidentally being overwritten from one test to the next.
 
 We'll set up our tests using the Page-Object-Model. You can get more information on how this works from [Sweeky's talk](https://www.youtube.com/watch?v=4VR861BWkiU) at the Xamarin Developer Summit. To do this we'll use a helper class from Xappium.UITest:
 
@@ -84,38 +69,22 @@ public class LoginPage : BasePage
 }
 ```
 
-You'll notice that we provide a trait. This is generally the AutomationId of an element on the page that should be unique that page. Now let's add a test class to validates that our App Starts up and is on the LoginPage.
+You'll notice that we provide a trait. This is generally the AutomationId of an element on the page that should be unique that page. Now let's add a test class to validate that our App Starts up and is on the LoginPage.
 
 ```cs
-[Collection(nameof(XappiumTests))]
-public class AppTests : IDisposable
+public class AppTests : XappiumTestBase
 {
-    private ITestEngine Engine { get; }
-
-    public AppTests()
-    {
-        AppManager.StartApp();
-        Engine = AppManager.Engine;
-    }
-
     [Fact]
     public void AppLaunches()
     {
         new LoginPage();
     }
-
-    public void Dispose()
-    {
-        Engine.StopApp();
-    }
 }
 ```
 
-Our Test class will be part of the XappiumTests collection which ensures our tests do not run in parallel. It will implement IDisposable so that it can start the app when the constructor is called, and stop the app when it is disposed. This will ensure that each test starts a new session with Appium and screen shots from one test will not overwrite screenshots from another test.
-
 #### Picking a Unit Test Framework
 
-As mentioned earlier, Xappium UITest takes some inspiration from FluentAssertions, as a result Xappium.UITest is compatible with all major Unit Test Frameworks and will help raise the appropriate Assertions with your Test Framework. The Cli Tool uses `dotnet test` under the hood, so we have zero requirements on which Unit Test framework you are required to use as long as it works with dotnet test. The examples here are with Xunit because it's what I use. But it is not a hard requirement.
+Xappium UITest actually has no requirements on which test framework you need to use as long as it's compatible with `dotnet test`. As a result you are able to write your UI Tests using your favorite testing frameworks.
 
 ## Using the Cli Tool
 
