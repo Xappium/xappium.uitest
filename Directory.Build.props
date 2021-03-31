@@ -1,13 +1,13 @@
 <Project>
   <PropertyGroup>
     <Authors>Dan Siegel</Authors>
-    <Owners>Dan Siegel</Owners>
+    <Owners>Xappium</Owners>
     <Copyright>© Dan Siegel. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/dansiegel/Xappium.UITest</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Xappium/xappium.uitest</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/dansiegel/Xappium.UITest.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Xappium/xappium.uitest.git</RepositoryUrl>
     <PackageIcon>xappium-bot.png</PackageIcon>
     <NeutralLanguage>en-US</NeutralLanguage>
     <IncludeSymbols>True</IncludeSymbols>
