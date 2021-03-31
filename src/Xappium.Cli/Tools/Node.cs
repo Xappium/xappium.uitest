@@ -43,10 +43,10 @@ namespace Xappium.Tools
 
         public static async Task<bool> InstallPackage(string packageName, CancellationToken cancellationToken)
         {
-            Console.WriteLine($"npm install -g {packageName}");
+            Logger.WriteLine($"npm install -g {packageName}", LogLevel.Verbose);
             var isMac = EnvironmentHelper.IsRunningOnMac;
             var errorLines = new List<string>();
-            var stdOut = PipeTarget.ToDelegate(l => Console.WriteLine(l));
+            var stdOut = PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Verbose));
             var stdErr = PipeTarget.ToDelegate(l =>
             {
                 if (string.IsNullOrEmpty(l) || (isMac && l.Contains("did not detect a Windows system")))

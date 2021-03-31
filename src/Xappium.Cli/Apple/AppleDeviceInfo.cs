@@ -34,7 +34,7 @@ namespace Xappium.Apple
 
         // public void Boot()
         // {
-        //     Console.WriteLine($"Booting {Name} simulator.");
+        //     Logger.WriteLine($"Booting {Name} simulator.", LogLevel.Normal);
         //     using var process = new Process
         //     {
         //         StartInfo = new ProcessStartInfo("xcrun", $"simctl boot {Udid}")
@@ -50,9 +50,9 @@ namespace Xappium.Apple
         //     State = devices.First(x => x.Udid == Udid).State;
 
         //     if (State == SimulatorState.Booted)
-        //         Console.WriteLine($"{Name} booted.");
+        //         Logger.WriteLine($"{Name} booted.", LogLevel.Normal);
         //     else
-        //         Console.WriteLine($"{Name} was unable to complete booting.");
+        //         Logger.WriteLine($"{Name} was unable to complete booting.", LogLevel.Normal);
         // }
     }
 }

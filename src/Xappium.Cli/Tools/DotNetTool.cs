@@ -64,7 +64,8 @@ namespace Xappium.Tools
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex);
+                Logger.WriteWarning("Error reading test results");
+                Logger.WriteWarning(ex.ToString());
                 // suppress errors
             }
         }

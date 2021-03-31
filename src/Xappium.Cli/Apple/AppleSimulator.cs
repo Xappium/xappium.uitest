@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Xappium.Logging;
 
 namespace Xappium.Apple
 {
@@ -14,7 +15,7 @@ namespace Xappium.Apple
 
         public static void ShutdownAllSimulators()
         {
-            Console.WriteLine("Shutting down simulators");
+            Logger.WriteLine("Shutting down simulators", LogLevel.Detailed);
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo("xcrun", "simctl shutdown all")
@@ -32,7 +33,7 @@ namespace Xappium.Apple
 
         public static IEnumerable<AppleDeviceInfo> GetAvailableSimulators()
         {
-            Console.WriteLine("Getting Available Simulators");
+            Logger.WriteLine("Getting Available Simulators", LogLevel.Normal);
             var results = new Dictionary<int, string>();
             using var process = new Process
             {
@@ -47,7 +48,9 @@ namespace Xappium.Apple
             var sb = new StringBuilder();
             while(!process.StandardOutput.EndOfStream)
             {
-                sb.Append(process.StandardOutput.ReadLine());
+                var line = process.StandardOutput.ReadLine();
+                Logger.WriteLine(line, LogLevel.Normal);
+                sb.Append(line);
             }
 
             var json = sb.ToString();
@@ -69,7 +72,7 @@ namespace Xappium.Apple
         public static AppleDeviceInfo GetSimulator()
         {
             var devices = GetAvailableSimulators();
-            Console.WriteLine("Getting Default iPhone Simulator");
+            Logger.WriteLine("Getting Default iPhone Simulator", LogLevel.Normal);
             return devices
                 .Where(x => !x.Name.Contains("Max") && Regex.IsMatch(x.Name, @"^iPhone \d\d Pro") && x.IsAvailable)
                 .OrderByDescending(x => x.OSVersion)
