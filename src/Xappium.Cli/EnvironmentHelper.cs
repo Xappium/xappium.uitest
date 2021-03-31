@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Xappium.Android;
 using Xappium.Apple;
+using Xappium.Logging;
 
 namespace Xappium
 {
@@ -59,7 +60,11 @@ namespace Xappium
         {
             try
             {
-                return IsRunningOnMac && AppleSimulator.GetAvailableSimulators().Any();
+                var hasSimulators = AppleSimulator.GetAvailableSimulators().Any();
+                if(IsRunningOnMac && !hasSimulators)
+                    Logger.WriteError("You appear to be running on macOS, but there are no available Simulators installed.");
+
+                return IsRunningOnMac && hasSimulators;
             }
             catch { }
 
