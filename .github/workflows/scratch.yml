@@ -11,13 +11,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
     
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10.x'
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.x'
 
-      - name: Appium Server Action
-        uses: moatazeldebsy/Appium-Server-GitHub-Action@V1.0.5
+      - name: Appium Server
+        shell: bash
+        run: |
+          set -ex
+          echo "Install and Running Appium Server as a Background process"
+          sudo npm install -g appium --unsafe-perm=true --allow-root
+          appium -v
+          appium &>/dev/null &
 
       - name: Run UITests Android
         run: |
