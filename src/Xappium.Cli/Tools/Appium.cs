@@ -19,7 +19,7 @@ namespace Xappium.Tools
             {
                 var process = new Process
                 {
-                    StartInfo = new ProcessStartInfo("appium", "-v")
+                    StartInfo = new ProcessStartInfo("appium", "--address 127.0.0.1 -v")
                     {
                         CreateNoWindow = true,
                         RedirectStandardOutput = true
@@ -67,9 +67,9 @@ namespace Xappium.Tools
             if (!Directory.Exists(logDirectory))
                 Directory.CreateDirectory(logDirectory);
 
-            void HandleConsoleLine(string line)
+             void HandleConsoleLine(string line)
             {
-                if (line.Contains("listener started on 0.0.0.0:4723"))
+                if (line.Contains("listener started on ") && line.Contains(":4723"))
                 {
                     Logger.WriteLine(line, LogLevel.Minimal, defaultLog);
 
@@ -78,7 +78,7 @@ namespace Xappium.Tools
                     completed = true;
                 }
                 else if(line.Contains("make sure there is no other instance of this server running already") ||
-                    line.Contains("listen EADDRINUSE: address already in use 0.0.0.0:4723"))
+                    line.Contains("listen EADDRINUSE: address already in use"))
                 {
                     Logger.WriteWarning(line, defaultLog);
 
