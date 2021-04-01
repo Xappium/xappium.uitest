@@ -1,0 +1,24 @@
+name: Scratch
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+    
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.x
+
+      - name: Appium Server Action
+        uses: moatazeldebsy/Appium-Server-GitHub-Action@V1.0.5
+
+      - name: Run UITests Android
+        run: |
+          dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.Android/TestApp.Android.csproj --logger normal
