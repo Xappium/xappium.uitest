@@ -21,15 +21,6 @@ jobs:
         with:
           dotnet-version: '3.1.x'
 
-      - name: Appium Server
-        shell: bash
-        run: |
-          set -ex
-          echo "Install and Running Appium Server as a Background process"
-          sudo npm install -g appium --unsafe-perm=true --allow-root
-          appium -v
-          appium &>/dev/null &
-
       - name: Run UITests Android
         run: |
           dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.Android/TestApp.Android.csproj --logger normal
