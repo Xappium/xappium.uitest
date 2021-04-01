@@ -67,7 +67,7 @@ namespace Xappium.Tools
             if (!Directory.Exists(logDirectory))
                 Directory.CreateDirectory(logDirectory);
 
-             void HandleConsoleLine(string line)
+            void HandleConsoleLine(string line)
             {
                 if (line.Contains("listener started on ") && line.Contains(":4723"))
                 {
