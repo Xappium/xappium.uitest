@@ -13,13 +13,22 @@ namespace Xappium.Tools
     {
         private const string defaultLog = "appium.log";
 
+        public static string Address { get; set; } = "127.0.0.1";
+        public static int Port { get; set; } = 4723;
+
         public static string Version
         {
-            get
-            {
+            get 
+            { 
+                var address = string.Empty;
+                if (!string.IsNullOrEmpty(Address))
+                    address = $"--address {Address}";
+
+                var port = $"--port {Port}";
+                 
                 var process = new Process
                 {
-                    StartInfo = new ProcessStartInfo("appium", "-v")
+                    StartInfo = new ProcessStartInfo("appium", $"{address} {port} -v")
                     {
                         CreateNoWindow = true,
                         RedirectStandardOutput = true
@@ -69,7 +78,7 @@ namespace Xappium.Tools
 
             void HandleConsoleLine(string line)
             {
-                if (line.Contains("listener started on 0.0.0.0:4723"))
+                if (line.Contains("listener started on ") && line.Contains($":{Port}"))
                 {
                     Logger.WriteLine(line, LogLevel.Minimal, defaultLog);
 
