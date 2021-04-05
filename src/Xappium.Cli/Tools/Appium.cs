@@ -87,7 +87,7 @@ namespace Xappium.Tools
                     completed = true;
                 }
                 else if(line.Contains("make sure there is no other instance of this server running already") ||
-                    line.Contains("listen EADDRINUSE: address already in use 0.0.0.0:4723"))
+                    line.Contains("listen EADDRINUSE: address already in use"))
                 {
                     Logger.WriteWarning(line, defaultLog);
 
