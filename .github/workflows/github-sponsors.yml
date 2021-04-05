@@ -13,4 +13,5 @@ jobs:
         id: sponsor-labels
         uses: brianlagunas/sponsor-action@v1.0
         with:
+          maintainers: 'dansiegel'
           github_token: ${{ secrets.GITHUB_TOKEN }}
