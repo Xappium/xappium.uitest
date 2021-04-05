@@ -1,0 +1,42 @@
+name: UITests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+    
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10.x'
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+
+      - name: UITests - Android
+        run: |
+          dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.Android/TestApp.Android.csproj --logger normal
+
+      - name: UITests - iOS
+        run: |
+          dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.iOS/TestApp.iOS.csproj --logger normal
+
+      - name: Report UITest Results
+        uses: zyborg/dotnet-tests-report@v1
+        with:
+          test_results_path: UITest/results
+          report_name: UI_Test_Results
+          report_title: UI Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,7 +1,15 @@
-﻿{
+{
     "appId": "com.avantipoint.testapp",
     "settings": {
         "username": "Dan",
         "password": "HelloW0r!d"
+    },
+    "capabilities": {
+        "espressoBuildConfig": "{ \"additionalAndroidTestDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ], \"additionalAppDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ] }",
+        "showGradleLog": "true",
+        "isHeadless": "true",
+        "forceEspressoRebuild": "true",
+        "avdLaunchTimeout": "120000",
+        "avdReadyTimeout": "300000"
     }
 }

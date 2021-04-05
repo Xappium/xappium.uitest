@@ -65,6 +65,21 @@ namespace Xappium
             ShortName = "droid")]
         public int? AndroidSdk { get; }
 
+        [Option(Description = "Skips running the appium server as part of the tool and assumes another running instance",
+            LongName = "skip-appium",
+            ShortName = "sa")]
+        public bool SkipAppium { get; } = false;
+
+        [Option(Description = "Specifies the address to start appium server listening on.",
+            LongName = "appium-address",
+            ShortName = "aa")]
+        public string AppiumAddress { get; } = "127.0.0.1";
+
+        [Option(Description = "Specifies the port to start appium server listening on.",
+            LongName = "appium-port",
+            ShortName = "ap")]
+        public int AppiumPort { get; } = 4723;
+
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members",
             Justification = "Called by McMaster")]
         private async Task<int> OnExecuteAsync(CancellationToken cancellationToken)
@@ -86,6 +101,12 @@ namespace Xappium
                 Logger.WriteLine($"Build and Test artifacts will be stored at {BaseWorkingDirectory}", LogLevel.Detailed);
 
                 ValidatePaths();
+
+                if (AppiumPort < 80 || AppiumPort > ushort.MaxValue)
+                    throw new Exception("Specified Appium Port is out of range");
+
+                if (Uri.CheckHostName(AppiumAddress) == UriHostNameType.Unknown)
+                    throw new Exception("Invalid Appium Address specified.  Must by IP Address or valid host name.");
 
                 var headBin = Path.Combine(BaseWorkingDirectory, "bin", "device");
                 var uiTestBin = Path.Combine(BaseWorkingDirectory, "bin", "uitest");
@@ -111,12 +132,24 @@ namespace Xappium
 
                 await ConfigurationGenerator.GenerateTestConfig(headBin, uiTestBin, appProject.Platform, ConfigurationPath, BaseWorkingDirectory, AndroidSdk, DisplayGeneratedConfig, cancellationToken);
 
-                if(!await Appium.Install(cancellationToken))
-                {
-                    return 0;
-                }
+                Appium.Address = AppiumAddress;
+                Appium.Port = AppiumPort;
 
-                appium = await Appium.Run(BaseWorkingDirectory).ConfigureAwait(false);
+                Logger.WriteLine($"Appium {AppiumAddress}:{AppiumPort}", LogLevel.Normal);
+
+                if (!SkipAppium)
+                {
+                    Logger.WriteLine($"Installing/running Appium...", LogLevel.Normal);
+
+                    if (!await Appium.Install(cancellationToken))
+                        return 0;
+                    
+                    appium = await Appium.Run(BaseWorkingDirectory).ConfigureAwait(false);
+                }
+                else
+                {
+                    Logger.WriteLine("Appium skipped.", LogLevel.Normal);
+                }
 
                 await DotNetTool.Test(UITestProjectPathInfo.FullName, uiTestBin, Configuration?.Trim(), Path.Combine(BaseWorkingDirectory, "results"), cancellationToken)
                     .ConfigureAwait(false);
