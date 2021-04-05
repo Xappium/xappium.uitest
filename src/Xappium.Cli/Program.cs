@@ -102,6 +102,12 @@ namespace Xappium
 
                 ValidatePaths();
 
+                if (AppiumPort < 80 || AppiumPort > ushort.MaxValue)
+                    throw new Exception("Specified Appium Port is out of range");
+
+                if (Uri.CheckHostName(AppiumAddress) == UriHostNameType.Unknown)
+                    throw new Exception("Invalid Appium Address specified.  Must by IP Address or valid host name.");
+
                 var headBin = Path.Combine(BaseWorkingDirectory, "bin", "device");
                 var uiTestBin = Path.Combine(BaseWorkingDirectory, "bin", "uitest");
 
