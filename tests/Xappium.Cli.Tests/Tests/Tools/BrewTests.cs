@@ -8,11 +8,6 @@ namespace Xappium.Cli.Tests.Tools
     [Collection(nameof(Tool))]
     public class BrewTests
     {
-        public BrewTests()
-        {
-            TestEnvironmentHost.Init();
-        }
-
         [MacOSFact]
         public async Task InstallsAppleSimUtils()
         {

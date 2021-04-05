@@ -8,11 +8,6 @@ namespace Xappium.Cli.Tests.Tools
     [Collection(nameof(Tool))]
     public class PipTests
     {
-        public PipTests()
-        {
-            TestEnvironmentHost.Init();
-        }
-
         [MacOSFact]
         public async Task UpdatesPip()
         {

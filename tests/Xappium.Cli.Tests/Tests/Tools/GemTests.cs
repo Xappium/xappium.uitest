@@ -8,11 +8,6 @@ namespace Xappium.Cli.Tests.Tools
     [Collection(nameof(Tool))]
     public class GemTests
     {
-        public GemTests()
-        {
-            TestEnvironmentHost.Init();
-        }
-
         [MacOSFact]
         public async Task InstallsXcPretty()
         {
