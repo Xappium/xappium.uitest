@@ -6,6 +6,7 @@
     },
     "avdLaunchTimeout": 120000,
     "avdReadyTimeout": 300000,
+    "isHeadless": true,
     "forceEspressoRebuild": true,
     "espressoBuildConfig": "{ \"additionalAndroidTestDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ], \"additionalAppDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ] }"
 }
