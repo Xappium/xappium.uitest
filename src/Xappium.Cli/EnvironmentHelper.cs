@@ -10,11 +10,15 @@ namespace Xappium
 {
     public static class EnvironmentHelper
     {
-        public static readonly bool IsRunningOnMac = IsRunningOnMacInternal();
+        private static readonly Lazy<bool> _lazyIsRunningOnMac = new Lazy<bool>(IsRunningOnMacInternal);
+        private static readonly Lazy<bool> _lazyIsAndroidSupported = new Lazy<bool>(IsAndroidSupportedInternal);
+        private static readonly Lazy<bool> _lazyIsIOSSupported = new Lazy<bool>(IsIOSSupportedInternal);
 
-        public static readonly bool IsAndroidSupported = IsAndroidSupportedInternal();
+        public static bool IsRunningOnMac => _lazyIsRunningOnMac.Value;
 
-        public static readonly bool IsIOSSupported = IsIOSSupportedInternal();
+        public static bool IsAndroidSupported => _lazyIsAndroidSupported.Value;
+
+        public static bool IsIOSSupported => _lazyIsIOSSupported.Value;
 
         //From Managed.Windows.Forms/XplatUI
         [DllImport("libc")]
