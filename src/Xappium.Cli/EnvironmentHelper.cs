@@ -83,9 +83,10 @@ namespace Xappium
                                    .Where(x => !string.IsNullOrEmpty(x) && Directory.Exists(x));
             return systemPaths.SelectMany(x => new[]
                 {
-                    Path.Combine(x, toolName),
                     Path.Combine(x, $"{toolName}.exe"),
-                    Path.Combine(x, $"{toolName}.bat")
+                    Path.Combine(x, $"{toolName}.bat"),
+                    Path.Combine(x, $"{toolName}.cmd"),
+                    Path.Combine(x, toolName),
                 })
                 .Where(x => File.Exists(x))
                 .FirstOrDefault();

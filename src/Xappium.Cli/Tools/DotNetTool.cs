@@ -81,12 +81,13 @@ namespace Xappium.Tools
 
         private static async Task Execute(string args, LogLevel logLevel, CancellationToken cancellationToken)
         {
-            Logger.WriteLine($"{DotNetExe.FullPath} {args}", LogLevel.Normal);
+            var cliTool = DotNetExe.FullPath ?? "dotnet";
+            Logger.WriteLine($"{cliTool} {args}", LogLevel.Normal);
             var stdErrBuffer = new StringBuilder();
             var stdOut = PipeTarget.ToDelegate(l => Logger.WriteLine(l, logLevel));
             var stdErr = PipeTarget.ToStringBuilder(stdErrBuffer);
 
-            var result = await Cli.Wrap(DotNetExe.FullPath)
+            var result = await Cli.Wrap(cliTool)
                 .WithArguments(args)
                 .WithStandardErrorPipe(stdOut)
                 .WithStandardErrorPipe(stdErr)

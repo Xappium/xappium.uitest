@@ -25,10 +25,11 @@ namespace Xappium.Tools
                     address = $"--address {Address}";
 
                 var port = $"--port {Port}";
-                 
+
+                var toolPath = EnvironmentHelper.GetToolPath("appium");
                 var process = new Process
                 {
-                    StartInfo = new ProcessStartInfo("appium", $"{address} {port} -v")
+                    StartInfo = new ProcessStartInfo(toolPath, $"{address} {port} -v")
                     {
                         CreateNoWindow = true,
                         RedirectStandardOutput = true

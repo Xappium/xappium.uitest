@@ -43,7 +43,8 @@ namespace Xappium.Tools
 
         public static async Task<bool> InstallPackage(string packageName, CancellationToken cancellationToken)
         {
-            Logger.WriteLine($"npm install -g {packageName}", LogLevel.Verbose);
+            var toolPath = EnvironmentHelper.GetToolPath("npm");
+            Logger.WriteLine($"{toolPath} install -g {packageName}", LogLevel.Verbose);
             var isMac = EnvironmentHelper.IsRunningOnMac;
             var errorLines = new List<string>();
             var stdOut = PipeTarget.ToDelegate(l => Logger.WriteLine(l, LogLevel.Verbose));
@@ -53,8 +54,11 @@ namespace Xappium.Tools
                     return;
                 errorLines.Add(l);
             });
-            await Cli.Wrap("npm")
-                .WithArguments($"install -g {packageName}")
+            await Cli.Wrap(toolPath)
+                //.WithArguments($"install -g {packageName}")
+                .WithArguments(b => b.Add("install")
+                                .Add("-g")
+                                .Add(packageName))
                 .WithValidation(CommandResultValidation.None)
                 .WithStandardOutputPipe(stdOut)
                 .WithStandardErrorPipe(stdErr)
