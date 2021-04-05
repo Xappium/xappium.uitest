@@ -30,6 +30,7 @@ namespace Xappium.UITest.Platforms
             AddAdditionalCapability(options, MobileCapabilityType.PlatformName, "Android");
             AddAdditionalCapability(options, MobileCapabilityType.DeviceName, config.DeviceName);
             AddAdditionalCapability(options, MobileCapabilityType.AutomationName, "Espresso");
+            AddAdditionalCapability(options, "showGradleLog", true);
 
             if(!string.IsNullOrEmpty(config.UDID))
             {
