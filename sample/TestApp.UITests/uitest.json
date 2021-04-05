@@ -4,5 +4,6 @@
         "username": "Dan",
         "password": "HelloW0r!d"
     },
+    "forceEspressoRebuild": true,
     "espressoBuildConfig": "{ \"additionalAndroidTestDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ], \"additionalAppDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ] }"
 }
