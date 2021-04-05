@@ -4,9 +4,12 @@
         "username": "Dan",
         "password": "HelloW0r!d"
     },
-    "avdLaunchTimeout": 120000,
-    "avdReadyTimeout": 300000,
-    "isHeadless": true,
-    "forceEspressoRebuild": true,
-    "espressoBuildConfig": "{ \"additionalAndroidTestDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ], \"additionalAppDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ] }"
+    "capabilities": {
+        "espressoBuildConfig": "{ \"additionalAndroidTestDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ], \"additionalAppDependencies\": [ \"androidx.lifecycle:lifecycle-common:2.2.0\" ] }",
+        "showGradleLog": "true",
+        "isHeadless": "true",
+        "forceEspressoRebuild": "true",
+        "avdLaunchTimeout": "120000",
+        "avdReadyTimeout": "300000"
+    }
 }
