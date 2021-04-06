@@ -18,17 +18,20 @@ namespace Xappium.Tools
 
         public static string Version
         {
-            get 
-            { 
+            get
+            {
+                var toolPath = EnvironmentHelper.GetToolPath("appium");
+                if (string.IsNullOrEmpty(toolPath))
+                    return null;
+
                 var address = string.Empty;
                 if (!string.IsNullOrEmpty(Address))
                     address = $"--address {Address}";
 
                 var port = $"--port {Port}";
-                 
                 var process = new Process
                 {
-                    StartInfo = new ProcessStartInfo("appium", $"{address} {port} -v")
+                    StartInfo = new ProcessStartInfo(toolPath, $"{address} {port} -v")
                     {
                         CreateNoWindow = true,
                         RedirectStandardOutput = true

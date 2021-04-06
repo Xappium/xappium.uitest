@@ -87,7 +87,6 @@ stages:
 
       - job: unit_tests_windows
         displayName: Unit Tests (Windows)
-        condition: and(succeeded(), eq(variables['EnableWindowsCITests'], true))
         pool:
           vmImage: windows-latest
           demands:

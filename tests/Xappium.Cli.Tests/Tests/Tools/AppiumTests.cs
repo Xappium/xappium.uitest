@@ -11,11 +11,6 @@ namespace Xappium.Cli.Tests.Tools
     [Collection(nameof(Tool))]
     public class AppiumTests
     {
-        public AppiumTests()
-        {
-            TestEnvironmentHost.Init();
-        }
-
         [Fact]
         public async Task InstallsAppium()
         {
@@ -45,7 +40,8 @@ namespace Xappium.Cli.Tests.Tools
                 disposable = null;
                 ex = await Record.ExceptionAsync(() => AssertAppiumIsRunning(false));
                 ex.Should().NotBeNull().And.BeOfType<HttpRequestException>();
-                ex.Message.Should().BeEquivalentTo("Connection refused");
+                var expectedMessage = EnvironmentHelper.IsRunningOnMac ? "Connection refused" : "No connection could be made because the target machine actively refused it.";
+                ex.Message.Should().BeEquivalentTo(expectedMessage);
             }
             finally
             {

@@ -72,7 +72,6 @@ namespace Xappium.Android
                 .Add("--compact");
             }, cancellationToken).ConfigureAwait(false);
 
-            System.Diagnostics.Debugger.Launch();
             // Skip the Parsing notification
             return output.Split('\n').Select(x => x.Trim()).Skip(1);
         }

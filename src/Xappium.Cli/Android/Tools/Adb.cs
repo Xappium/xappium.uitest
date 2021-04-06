@@ -35,7 +35,6 @@ namespace Xappium.Android
         {
             var output = await ExecuteInternal(b => b.Add("devices"), cancellationToken).ConfigureAwait(false);
 
-            System.Diagnostics.Debugger.Launch();
             var ids = output.Split('\n').Select(x => x.Trim()).Where(x => Regex.IsMatch(x, androidDeviceRegex))
                 .Select(x => Regex.Replace(x, androidDeviceRegex, string.Empty));
 

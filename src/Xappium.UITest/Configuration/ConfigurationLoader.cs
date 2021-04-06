@@ -14,9 +14,6 @@ namespace Xappium.UITest.Configuration
 
         public static UITestConfiguration Load(Assembly assembly)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                throw new PlatformNotSupportedException("UI Tests are currently only supported on macOS only.");
-
             var config = new UITestConfiguration();
 
             if (File.Exists(UITestDefaults.UITestConfigFile))
