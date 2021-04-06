@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Xappium.Apple;
 using Xappium.Tools;
 
 namespace Xappium.BuildSystem
@@ -33,7 +35,17 @@ namespace Xappium.BuildSystem
 
         public override Task<bool> IsSupported()
         {
-            return Task.FromResult(EnvironmentHelper.IsIOSSupported);
+            AppleDeviceInfo simulator = null;
+            try
+            {
+                simulator = AppleSimulator.GetSimulator();
+            }
+            catch(Exception ex)
+            {
+                Logging.Logger.WriteError(ex);
+            }
+
+            return Task.FromResult(simulator != null);
         }
     }
 }

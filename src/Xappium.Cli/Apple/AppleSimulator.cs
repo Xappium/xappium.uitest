@@ -49,7 +49,7 @@ namespace Xappium.Apple
             while(!process.StandardOutput.EndOfStream)
             {
                 var line = process.StandardOutput.ReadLine();
-                Logger.WriteLine(line, LogLevel.Normal);
+                Logger.WriteLine(line, LogLevel.Detailed);
                 sb.Append(line);
             }
 
