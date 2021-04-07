@@ -25,9 +25,14 @@ namespace Xappium.UITest.Platforms
 
         private UITestConfiguration _config { get; }
 
+        private int viewSelectorTagKey { get; set; } = -1;
+
+        private bool viewSelectorTagStrategy { get; set; }
+
         protected XappiumTestEngineBase(UITestConfiguration config)
         {
             _config = config;
+            SetupSelectorStrategy();
             SetupDriver();
         }
 
@@ -40,6 +45,28 @@ namespace Xappium.UITest.Platforms
 
             // Setup timeouts
             Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(SHORT_TIMEOUT);
+        }
+
+        private void SetupSelectorStrategy()
+        {
+            // tagWithKey:8675309
+            const string TagWithId = "tagWithKey:";
+
+            var strategy = _config?.ViewSelectorStrategy;
+
+            if (!string.IsNullOrEmpty(strategy))
+            {
+                if (strategy.Equals("tag", StringComparison.OrdinalIgnoreCase))
+                {
+                    viewSelectorTagStrategy = true;
+                }
+                else if (strategy.StartsWith(TagWithId, StringComparison.OrdinalIgnoreCase)
+                    && int.TryParse(strategy.Substring(TagWithId.Length), out var key))
+                {
+                    viewSelectorTagKey = key;
+                    viewSelectorTagStrategy = true;
+                }
+            }
         }
 
         protected abstract T CreateDriver(AppiumOptions options, UITestConfiguration config);
@@ -245,10 +272,30 @@ namespace Xappium.UITest.Platforms
             action.Perform();
         }
 
+        // If you set a tag by resource id:
+        //    view.setTag(R.id.maui_automation_id, "theViewAutomationIdValue");
+        // You can use the view matcher:
+        //    onView(withTagKey(R.id.maui_automation_id, is((Object)"theViewAutomationIdValue")))
         string GetTagKeyViewMatcherJson(int resourceId, string automationId) =>
             "{ \"name\" : \"withTagKey\", \"args\" : [ " + resourceId + ", { \"name\" : \"is\", \"args\" : \"" + automationId + "\" } ] }";
 
-        public virtual By ByAutomationId(string automationId) =>
-            MobileBy.AccessibilityId(automationId);
+        // If you set a tag:
+        //    view.setTag("theViewAutomationIdValue");
+        // You can use:
+        //    onView(withTagValue(is((Object)"theViewAutomationIdValue")))
+        string GetTagViewMatcherJson(string automationId) =>
+           "{ \"name\" : \"withTagValue\", \"args\" : [ { \"name\" : \"is\", \"args\" : \"" + automationId + "\" } ] }";
+
+        public virtual By ByAutomationId(string automationId)
+        {
+            if (Platform == Platform.Android && viewSelectorTagStrategy)
+            {
+                return MobileBy.AndroidViewMatcher(viewSelectorTagKey >= 0
+                    ? GetTagKeyViewMatcherJson(viewSelectorTagKey, automationId)
+                    : GetTagViewMatcherJson(automationId));
+            }
+
+            return MobileBy.AccessibilityId(automationId);
+        }
     }
 }
