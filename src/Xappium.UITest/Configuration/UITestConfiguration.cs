@@ -23,6 +23,8 @@ namespace Xappium.UITest.Configuration
 
         public string ScreenshotsPath { get; set; }
 
+        public string ViewSelectorStrategy { get; set; }
+
         public Uri AppiumServer { get; set; }
 
         public Dictionary<string, string> Capabilities { get; set; } = new Dictionary<string, string>();
