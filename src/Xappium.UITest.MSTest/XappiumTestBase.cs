@@ -1,20 +1,21 @@
-﻿using NUnit.Framework;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Xappium.UITest
+namespace Xappium.UITest.MSTest
 {
-    [NonParallelizable]
-    public class XappiumTestBase
+    [DoNotParallelize]
+    public abstract class XappiumTestBase
     {
         protected ITestEngine Engine { get; private set; }
 
-        [SetUp]
+        [TestInitialize]
         public virtual void StartApp()
         {
             AppManager.StartApp();
             Engine = AppManager.Engine;
         }
 
-        [TearDown]
+        [TestCleanup]
         public virtual void CloseApp()
         {
             Engine.StopApp();
