@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Xappium.UITest</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Running Xappium.UITest with MSTest? This package contains the base class and helpers you need to help you ensure that your tests execute as expected. This will start and stop the app between each test run, ensure that you get a new Appium session to properly group your Screenshots, and disable test parallelization since only one UI Test can run at a time.</Description>
+    <PackageTags>mstest;xappium;uitest;appium;xamarin;maui</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xappium.UITest\Xappium.UITest.csproj" />
+  </ItemGroup>
+
+</Project>
