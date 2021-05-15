@@ -97,7 +97,7 @@ The Cli tool is meant to provide an easy to use runner for your UI Tests. In ord
 It's worth noting that the tools here are designed to provide an experience that is tailored to running on an iOS Simulator or Android Emulator. These settings are not customizable.
 
 ```bash
-xappiumtest -uitest sample/TestApp.UITests/TestApp.UITests.csproj \
+xappium test -uitest sample/TestApp.UITests/TestApp.UITests.csproj \
     -app sample/TestApp.iOS/TestApp.iOS.csproj
 ```
 
