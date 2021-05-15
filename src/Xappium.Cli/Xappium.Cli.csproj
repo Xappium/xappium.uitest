@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Xappium</RootNamespace>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>xappiumtest</ToolCommandName>
+    <ToolCommandName>xappium</ToolCommandName>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -15,6 +15,9 @@
   <ItemGroup>
     <PackageReference Include="AndroidXml" Version="1.1.14" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
-    <PackageReference Include="CliWrap" Version="3.3.1" />
+    <PackageReference Include="CliWrap" Version="3.3.2" />
+    <PackageReference Include="McMaster.Extensions.Hosting.CommandLine" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 </Project>

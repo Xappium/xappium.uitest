@@ -2,11 +2,16 @@ name: UITests
 
 on:
   push:
+    branches: [ master ]
   pull_request:
 
 jobs:
 
   build:
+    strategy:
+      matrix:
+        os: [iOS, Android]
+
     runs-on: macos-latest
 
     steps:
@@ -14,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
         with:
             fetch-depth: 0
-    
+
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
@@ -25,13 +30,9 @@ jobs:
         with:
           dotnet-version: '3.1.x'
 
-      - name: UITests - Android
+      - name: UITests - ${{ matrix.os }}
         run: |
-          dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.Android/TestApp.Android.csproj --logger normal
-
-      - name: UITests - iOS
-        run: |
-          dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.iOS/TestApp.iOS.csproj --logger normal
+          dotnet run --project src/Xappium.Cli/Xappium.Cli.csproj -c Release -- test -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.${{ matrix.os }}/TestApp.${{ matrix.os }}.csproj --logger normal
 
       - name: Report UITest Results
         uses: zyborg/dotnet-tests-report@v1
