@@ -54,97 +54,97 @@ stages:
               artifact: 'nuget'
               targetPath: $(Build.ArtifactStagingDirectory)
 
-  - stage: test
-    displayName: Run Tests
-    jobs:
-      - job: unit_tests_mac
-        displayName: Unit Tests (Mac)
-        pool:
-          vmImage: macOS-latest
-          demands:
-          - MSBuild
-        workspace:
-          clean: all
-        steps:
-          - task: UseDotNet@2
-            displayName: Install .NET SDK
-            inputs:
-              useGlobalJson: true
+  # - stage: test
+  #   displayName: Run Tests
+  #   jobs:
+  #     - job: unit_tests_mac
+  #       displayName: Unit Tests (Mac)
+  #       pool:
+  #         vmImage: macOS-latest
+  #         demands:
+  #         - MSBuild
+  #       workspace:
+  #         clean: all
+  #       steps:
+  #         - task: UseDotNet@2
+  #           displayName: Install .NET SDK
+  #           inputs:
+  #             useGlobalJson: true
 
-          - task: NuGetCommand@2
-            displayName: NuGet Restore
-            inputs:
-              command: restore
+  #         - task: NuGetCommand@2
+  #           displayName: NuGet Restore
+  #           inputs:
+  #             command: restore
 
-          - task: DotNetCoreCLI@2
-            displayName: DotNet Test
-            inputs:
-              command: test
-              projects: tests/**/*.csproj
-              publishTestResults: true
-              testRunTitle: Unit Tests (Mac)
-              arguments: '--collect "Code coverage"'
+  #         - task: DotNetCoreCLI@2
+  #           displayName: DotNet Test
+  #           inputs:
+  #             command: test
+  #             projects: tests/**/*.csproj
+  #             publishTestResults: true
+  #             testRunTitle: Unit Tests (Mac)
+  #             arguments: '--collect "Code coverage"'
 
-      - job: unit_tests_windows
-        displayName: Unit Tests (Windows)
-        pool:
-          vmImage: windows-latest
-          demands:
-          - MSBuild
-        workspace:
-          clean: all
-        steps:
-          - task: UseDotNet@2
-            displayName: Install .NET SDK
-            inputs:
-              useGlobalJson: true
+  #     - job: unit_tests_windows
+  #       displayName: Unit Tests (Windows)
+  #       pool:
+  #         vmImage: windows-latest
+  #         demands:
+  #         - MSBuild
+  #       workspace:
+  #         clean: all
+  #       steps:
+  #         - task: UseDotNet@2
+  #           displayName: Install .NET SDK
+  #           inputs:
+  #             useGlobalJson: true
 
-          - task: NuGetCommand@2
-            displayName: NuGet Restore
-            inputs:
-              command: restore
+  #         - task: NuGetCommand@2
+  #           displayName: NuGet Restore
+  #           inputs:
+  #             command: restore
 
-          - task: DotNetCoreCLI@2
-            displayName: DotNet Test
-            inputs:
-              command: test
-              projects: tests/**/*.csproj
-              publishTestResults: true
-              testRunTitle: Unit Tests (Windows)
-              arguments: '--collect "Code coverage"'
+  #         - task: DotNetCoreCLI@2
+  #           displayName: DotNet Test
+  #           inputs:
+  #             command: test
+  #             projects: tests/**/*.csproj
+  #             publishTestResults: true
+  #             testRunTitle: Unit Tests (Windows)
+  #             arguments: '--collect "Code coverage"'
 
-      - job: android_uitest
-        displayName: 'Android UI Tests'
-        pool:
-          vmImage: macOS-latest
-          demands:
-          - MSBuild
-          - Xamarin.Android
-          - JDK
-          - AndroidSDK
-        workspace:
-          clean: all
-        steps:
-          - template: build/steps/run-uitests.yml
-            parameters:
-              projectPath: sample/TestApp.Android/TestApp.Android.csproj
-              platform: Android
+      # - job: android_uitest
+      #   displayName: 'Android UI Tests'
+      #   pool:
+      #     vmImage: macOS-latest
+      #     demands:
+      #     - MSBuild
+      #     - Xamarin.Android
+      #     - JDK
+      #     - AndroidSDK
+      #   workspace:
+      #     clean: all
+      #   steps:
+      #     - template: build/steps/run-uitests.yml
+      #       parameters:
+      #         projectPath: sample/TestApp.Android/TestApp.Android.csproj
+      #         platform: Android
 
-      - job: ios_uitest
-        displayName: 'iOS UI Tests'
-        pool:
-          vmImage: macOS-latest
-          demands:
-          - MSBuild
-        workspace:
-          clean: all
-        steps:
-          - template: build/steps/run-uitests.yml
-            parameters:
-              projectPath: sample/TestApp.iOS/TestApp.iOS.csproj
-              platform: iOS
+      # - job: ios_uitest
+      #   displayName: 'iOS UI Tests'
+      #   pool:
+      #     vmImage: macOS-latest
+      #     demands:
+      #     - MSBuild
+      #   workspace:
+      #     clean: all
+      #   steps:
+      #     - template: build/steps/run-uitests.yml
+      #       parameters:
+      #         projectPath: sample/TestApp.iOS/TestApp.iOS.csproj
+      #         platform: iOS
 
-  - stage: deploy
+  - stage: preview
     displayName: Deploy Artifacts
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['system.pullrequest.isfork'], false))
     jobs:
@@ -159,21 +159,24 @@ stages:
                   displayName: NuGet Push
                   inputs:
                     command: push
-                    packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
+                    packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
                     nuGetFeedType: external
                     publishFeedCredentials: SponsorConnect
 
-      # - deployment: nugetOrg
-      #   displayName: 'NuGet.org'
-      #   environment: NuGet
-      #   strategy:
-      #     runOnce:
-      #       deploy:
-      #         steps:
-      #           - task: NuGetCommand@2
-      #             displayName: NuGet Push
-      #             inputs:
-      #               command: push
-      #               packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;$(Pipeline.Workspace)/**/*.snupkg'
-      #               nuGetFeedType: external
-      #               publishFeedCredentials: 'NuGet.org'
+  - stage: rtm
+    displayName: Deploy to NuGet
+    jobs:
+      - deployment: nugetOrg
+        displayName: 'NuGet.org'
+        environment: NuGet
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: NuGetCommand@2
+                  displayName: NuGet Push
+                  inputs:
+                    command: push
+                    packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
+                    nuGetFeedType: external
+                    publishFeedCredentials: 'NuGet.org'
