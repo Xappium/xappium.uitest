@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Xappium.Cli": {
-      "commandName": "Project",
-      "commandLineArgs": "prepare -uitest sample/TestApp.UITests/TestApp.UITests.csproj -app sample/TestApp.Android/TestApp.Android.csproj",
-      "workingDirectory": "C:\\repos\\OSS\\xappium.uitest"
-    }
-  }
-}
