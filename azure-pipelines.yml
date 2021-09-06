@@ -1,5 +1,4 @@
 trigger:
-  batch: true
   branches:
     include:
     - master
@@ -173,6 +172,30 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  displayName: Get Build Resources
+
+                - powershell: build/Process-Release.ps1
+                  displayName: Process Artifacts for Release
+
+                - task: GitHubRelease@1
+                  inputs:
+                    gitHubConnection: 'github.com'
+                    repositoryName: '$(Build.Repository.Name)'
+                    action: 'create'
+                    target: '$(Build.SourceVersion)'
+                    tagSource: 'userSpecifiedTag'
+                    tag: 'v$(VersionName)'
+                    title: '$(ReleaseDisplayName)'
+                    releaseNotesSource: 'inline'
+                    releaseNotesInline: |
+                      # Description
+                      This is a release of $(VersionName). For more information please see the Changelog.
+                    isDraft: true
+                    isPreRelease: $(IS_PREVIEW)
+                    changeLogCompareToRelease: 'lastFullRelease'
+                    changeLogType: 'commitBased'
+
                 - task: NuGetCommand@2
                   displayName: NuGet Push
                   inputs:
