@@ -50,7 +50,7 @@ namespace Xappium.UITest
 
             if ((!Directory.Exists(testConfig.AppPath) && testConfig.Platform == Platform.iOS) ||
                 (!File.Exists(testConfig.AppPath) && testConfig.Platform == Platform.Android))
-                throw new FileNotFoundException($"The App Package could not be found at the specified location. '{testConfig.AppPath}'");
+                throw new FileNotFoundException($"The App Package could not be found at the specified location. '{testConfig.AppPath}' Check the {nameof(testConfig.AppPath)} setting in {UITestDefaults.UITestConfigFile} and/or your resources.");
 
             _engine = testConfig.Platform switch
             {
