@@ -18,7 +18,7 @@ namespace Xappium.UITest.Providers
                     .FirstOrDefault(x => x.Name == "AddTestAttachment" && x.GetParameters().Length == 2);
                 addTestAttachment.Invoke(null, new[] { filePath, description });
             }
-            catch(Exception ex)
+            catch
             {
                 // Suppress errors
             }
