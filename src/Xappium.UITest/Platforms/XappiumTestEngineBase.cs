@@ -36,6 +36,11 @@ namespace Xappium.UITest.Platforms
             SetupDriver();
         }
 
+        ~XappiumTestEngineBase ()
+        {
+            Dispose(false);
+        }
+
         private void SetupDriver()
         {
             var options = new AppiumOptions();
@@ -81,7 +86,29 @@ namespace Xappium.UITest.Platforms
         public IReadOnlyDictionary<string, string> Settings => _config.Settings;
 
         public void Dispose()
-            => StopApp();
+        {
+            Dispose(true);
+        }
+
+        bool disposed;
+        void Dispose (bool disposing)
+        {
+            if (disposed)
+                return;
+            if (disposing)
+                DisposeManagedResources();
+            DisposeUnmanagedResources();
+            disposed = true;
+        }
+
+        protected virtual void DisposeManagedResources ()
+        {
+            StopApp();
+        }
+
+        protected virtual void DisposeUnmanagedResources ()
+        {
+        }
 
         protected T Driver { get; private set; }
 
