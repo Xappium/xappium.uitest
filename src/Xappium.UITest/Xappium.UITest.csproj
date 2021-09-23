@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="buildTransistive\*.targets" Pack="true" PackFolder="build" />
+    <None Include="buildTransitive\*.targets"
+          Pack="True"
+          PackagePath="buildTransitive" />
   </ItemGroup>
 
 </Project>
