@@ -29,6 +29,6 @@
     <ProjectReference Include="..\..\src\Xappium.UITest\Xappium.UITest.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\src\Xappium.UITest\build\Xappium.UITest.targets" />
+  <Import Project="..\..\src\Xappium.UITest\buildTransitive\Xappium.UITest.targets" />
 
 </Project>

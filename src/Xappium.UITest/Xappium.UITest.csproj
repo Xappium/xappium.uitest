@@ -14,4 +14,8 @@
     <PackageReference Include="Appium.WebDriver" Version="4.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="buildTransistive\*.targets" Pack="true" PackFolder="build" />
+  </ItemGroup>
+
 </Project>
