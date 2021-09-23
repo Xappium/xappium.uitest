@@ -76,7 +76,7 @@ namespace Xappium.UITest.Platforms
 
         protected abstract T CreateDriver(AppiumOptions options, UITestConfiguration config);
 
-        protected abstract IUIElement CreateUIElement(E nativeElement);
+        protected virtual IUIElement CreateUIElement(E nativeElement) => new UIElementBase<E>(nativeElement);
 
         protected WebDriverWait Wait(TimeSpan? timeout = null)
         {
