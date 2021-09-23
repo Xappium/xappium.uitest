@@ -40,22 +40,5 @@ namespace Xappium.UITest.Platforms
 
             return new IOSDriver<IOSElement>(config.AppiumServer, options);
         }
-
-        protected override IUIElement CreateUIElement(IOSElement nativeElement) =>
-            new iOSUIElement(nativeElement);
-
-        private class iOSUIElement : UIElementBase<IOSElement>
-        {
-            public iOSUIElement(IOSElement element)
-                : base(element)
-            {
-            }
-
-            public override Rectangle Rect => _element.Rect;
-
-            public override ICoordinates Coordinates => _element.Coordinates;
-
-            public override Point LocationOnScreenOnceScrolledIntoView => _element.LocationOnScreenOnceScrolledIntoView;
-        }
     }
 }

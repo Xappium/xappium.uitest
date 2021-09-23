@@ -46,22 +46,5 @@ namespace Xappium.UITest.Platforms
             
             return new AndroidDriver<AndroidElement>(config.AppiumServer, options, TimeSpan.FromSeconds(90));
         }
-
-        protected override IUIElement CreateUIElement(AndroidElement nativeElement) =>
-            new AndroidUIElement(nativeElement);
-
-        private class AndroidUIElement : UIElementBase<AndroidElement>
-        {
-            public AndroidUIElement(AndroidElement element)
-                : base(element)
-            {
-            }
-
-            public override ICoordinates Coordinates => _element.Coordinates;
-
-            public override Rectangle Rect => _element.Rect;
-
-            public override Point LocationOnScreenOnceScrolledIntoView => _element.LocationOnScreenOnceScrolledIntoView;
-        }
     }
 }
